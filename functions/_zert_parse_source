@@ -1,0 +1,50 @@
+_zert_parse_source() {
+  local input="$1"
+
+  setopt localoptions extendedglob
+
+  # Reset output variables
+  typeset -g __ZERT_SOURCE_TYPE=""
+  typeset -g __ZERT_SOURCE_VALUE=""
+
+  # Check for empty input
+  if [[ -z "$input" ]]; then
+    _zert_ui_error "Empty plugin source"
+    return 1
+  fi
+
+  # Local path (absolute path starting with /)
+  if [[ "$input" = /* ]]; then
+    if [[ ! -d "$input" ]]; then
+      _zert_ui_error "Local path does not exist: $input"
+      return 1
+    fi
+    __ZERT_SOURCE_TYPE="local"
+    __ZERT_SOURCE_VALUE="$input"
+    return 0
+  fi
+
+  # SSH URL (git@domain:owner/repo)
+  if [[ "$input" = (#b)(git@[^:]*):([^/]##/[^/]##) ]]; then
+    __ZERT_SOURCE_TYPE="git"
+    __ZERT_SOURCE_VALUE="git://${match[1]#git@}/${match[2]}"
+    return 0
+  fi
+
+  # Full URL
+  if [[ "$input" = *://* ]]; then
+    __ZERT_SOURCE_TYPE="git"
+    __ZERT_SOURCE_VALUE="$input"
+    return 0
+  fi
+
+  # GitHub shorthand (user/repo pattern)
+  if [[ "$input" = (#b)([^/]##)/([^/]##) ]] && [[ "$input" != *" "* ]]; then
+    __ZERT_SOURCE_TYPE="git"
+    __ZERT_SOURCE_VALUE="https://github.com/$input"
+    return 0
+  fi
+
+  _zert_ui_error "Cannot parse plugin source: $input"
+  return 1
+}

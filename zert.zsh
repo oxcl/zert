@@ -18,8 +18,9 @@ fpath=("$_ZERT_BASE_DIR/functions" "$_ZERT_BASE_DIR/commands" $fpath)
 
 # Mark functions for autoload
 autoload -Uz _zert_check_deps
-autoload -Uz _zert_cmd_list _zert_cmd_update _zert_cmd_prune _zert_cmd_lock _zert_cmd_config
+autoload -Uz _zert_cmd_list _zert_cmd_update _zert_cmd_prune _zert_cmd_lock _zert_cmd_config _zert_cmd_use
 autoload -Uz _zert_ui_ok _zert_ui_error _zert_ui_log _zert_ui_progress _zert_ui_emphasize
+autoload -Uz _zert_parse_source _zert_plugin_add
 autoload -Uz zert
 
 # Run dependency check
