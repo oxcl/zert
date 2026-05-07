@@ -1,5 +1,4 @@
 # Stub for zert list command
 _zert_cmd_list() {
-  _zert_ui_header "Listing plugins"
   _zert_ui_log "Not yet implemented"
 }

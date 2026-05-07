@@ -4,11 +4,14 @@
 # Get the directory where this script is located
 _ZERT_BASE_DIR="${${(%):-%x}:A:h}"
 
+# Resolve ZERT_DIR with XDG defaults
+export ZERT_DIR="${ZERT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/zert}"
+
 # Resolve ZERT_PLUGINS_DIR with XDG defaults
-ZERT_PLUGINS_DIR="${ZERT_PLUGINS_DIR:-${ZERT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/zert}/plugins}"
+export ZERT_PLUGINS_DIR="${ZERT_PLUGINS_DIR:-$ZERT_DIR/plugins}"
 
 # Resolve other config paths
-ZERT_LOCKFILE="${ZERT_LOCKFILE:-${ZDOTDIR:-$HOME}/zert.lock}"
+export ZERT_LOCKFILE="${ZERT_LOCKFILE:-${ZDOTDIR:-$HOME}/zert.lock}"
 
 # Set up fpath for lazy loading
 fpath=("$_ZERT_BASE_DIR/functions" "$_ZERT_BASE_DIR/commands" $fpath)
