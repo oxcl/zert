@@ -37,10 +37,10 @@ No config files to maintain. No subcommands to memorize for adding plugins. No e
 Paste this single line at the top of your `.zshrc`:
 
 ```zsh
-ZERT_DIR="${ZERT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/zert}"; \
-[[ -f "$ZERT_DIR/zert/zert.zsh" ]] || \
+ZERT_PLUGINS_DIR="${ZERT_PLUGINS_DIR:-${ZERT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/zert}/plugins}"; \
+[[ -f "$ZERT_PLUGINS_DIR/zert/zert.zsh" ]] || \
 (curl -fsSL https://raw.githubusercontent.com/oxcl/zert/main/bootstrap.sh | zsh); \
-source "$ZERT_DIR/zert/zert.zsh"
+source "$ZERT_PLUGINS_DIR/zert/zert.zsh"
 ```
 
 That's it. The first time your shell starts, Zert bootstraps itself. On every subsequent start, it loads instantly from the cached clone.
