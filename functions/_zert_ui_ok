@@ -1,0 +1,13 @@
+_zert_ui_ok() {
+  local __ZERT_CLR_RESET __ZERT_CLR_GREEN __ZERT_CLR_BOLD
+  if [[ -z "$NO_COLOR" ]]; then
+    __ZERT_CLR_RESET=$'\033[0m'
+    __ZERT_CLR_GREEN=$'\033[32m'
+    __ZERT_CLR_BOLD=$'\033[1m'
+  else
+    __ZERT_CLR_RESET=''
+    __ZERT_CLR_GREEN=''
+    __ZERT_CLR_BOLD=''
+  fi
+  print -u2 "${__ZERT_CLR_GREEN}✓${__ZERT_CLR_RESET} ${__ZERT_CLR_GREEN}$(_zert_ui_emphasize "$*")${__ZERT_CLR_RESET}"
+}

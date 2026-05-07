@@ -1,0 +1,14 @@
+_zert_ui_progress() {
+  local plugin="$1" message="$2"
+  local __ZERT_CLR_RESET __ZERT_CLR_CYAN __ZERT_CLR_BOLD
+  if [[ -z "$NO_COLOR" ]]; then
+    __ZERT_CLR_RESET=$'\033[0m'
+    __ZERT_CLR_CYAN=$'\033[36m'
+    __ZERT_CLR_BOLD=$'\033[1m'
+  else
+    __ZERT_CLR_RESET=''
+    __ZERT_CLR_CYAN=''
+    __ZERT_CLR_BOLD=''
+  fi
+  printf "\r${__ZERT_CLR_CYAN}...${__ZERT_CLR_RESET} %-${COLUMNS:-80}s" "$(_zert_ui_emphasize "$plugin: $message")" >&2
+}

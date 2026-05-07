@@ -1,0 +1,16 @@
+_zert_ui_emphasize() {
+  local text="$*"
+  local __ZERT_CLR_RESET __ZERT_CLR_BOLD __ZERT_CLR_YELLOW
+  if [[ -z "$NO_COLOR" ]]; then
+    __ZERT_CLR_RESET=$'\033[0m'
+    __ZERT_CLR_YELLOW=$'\033[33m'
+    __ZERT_CLR_BOLD=$'\033[1m'
+  else
+    __ZERT_CLR_RESET=''
+    __ZERT_CLR_YELLOW=''
+    __ZERT_CLR_BOLD=''
+  fi
+  setopt localoptions extendedglob
+  text="${text//(#b)\*\*([^*]##)\*\*/${__ZERT_CLR_YELLOW}${__ZERT_CLR_BOLD}${match[1]}${__ZERT_CLR_RESET}}"
+  print -n "$text"
+}

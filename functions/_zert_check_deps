@@ -1,0 +1,25 @@
+# Dependency check function
+
+_zert_check_deps() {
+  local missing=0
+
+  # Check Zsh version (need >= 5.0)
+  if [[ "${ZSH_VERSION%%.*}" -lt 5 ]]; then
+    _zert_ui_error "Zsh 5.0 or higher is required (found $ZSH_VERSION)"
+    missing=1
+  fi
+
+  # Check for git
+  if ! command -v git >/dev/null 2>&1; then
+    _zert_ui_error "git is required but not found"
+    missing=1
+  fi
+
+  # Check for curl
+  if ! command -v curl >/dev/null 2>&1; then
+    _zert_ui_error "curl is required but not found"
+    missing=1
+  fi
+
+  return $missing
+}

@@ -1,0 +1,20 @@
+# Main dispatcher function - autoloaded on first call
+
+zert() {
+  local cmd="$1"
+
+  if [[ -z "$cmd" ]]; then
+    _zert_ui_error "Usage: zert <command> [args...]"
+    return 1
+  fi
+
+  shift
+
+  # Dispatch to subcommand handler (autoloaded from commands/)
+  if functions "_zert_cmd_$cmd" >/dev/null 2>&1; then
+    "_zert_cmd_$cmd" "$@"
+  else
+    _zert_ui_error "Unknown command: $cmd"
+    return 1
+  fi
+}
