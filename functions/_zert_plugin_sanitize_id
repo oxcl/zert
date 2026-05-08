@@ -1,0 +1,46 @@
+_zert_plugin_sanitize_id() {
+  local source_type="$1" source_value="$2"
+
+  local plugin_id=""
+
+  case "$source_type" in
+    git)
+      plugin_id="$source_value"
+
+      # Remove protocol prefixes
+      plugin_id="${plugin_id#https://}"
+      plugin_id="${plugin_id#http://}"
+      plugin_id="${plugin_id#git://}"
+
+      # Handle SSH format: git@domain:path
+      if [[ "$plugin_id" = *@*:* ]]; then
+        plugin_id="${plugin_id#*@}"
+        local domain="${plugin_id%%:*}"
+        local path="${plugin_id#*:}"
+        plugin_id="$domain/$path"
+      fi
+
+      # Remove .git suffix if present
+      plugin_id="${plugin_id%.git}"
+      ;;
+
+    local)
+      plugin_id="local${source_value//\//--}"
+      ;;
+
+    ohmyzsh)
+      plugin_id="ohmyzsh/${source_value#ohmyzsh/}"
+      ;;
+
+    prezto)
+      plugin_id="prezto/${source_value#prezto/}"
+      ;;
+
+    *)
+      _zert_ui_error "Unknown source type: $source_type"
+      return 1
+      ;;
+  esac
+
+  print -n "$plugin_id"
+}

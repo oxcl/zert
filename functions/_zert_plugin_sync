@@ -1,0 +1,59 @@
+_zert_plugin_sync() {
+  local plugin_id="$1" source_type="$2" source_value="$3" options="$4"
+  local plugin_dir="$ZERT_PLUGINS_DIR/$plugin_id"
+  local sync_action="$5"
+
+  case "$sync_action" in
+    register)
+      # New plugin - add lockfile entry
+      local commit_sha=""
+      commit_sha="$(git -C "$plugin_dir" rev-parse HEAD 2>/dev/null)"
+      if [[ -z "$commit_sha" ]]; then
+        _zert_ui_error "Failed to get commit SHA for: $plugin_id"
+        return 1
+      fi
+      _zert_lockfile_write_entry "$plugin_id" "$source_type" "$source_value" "$commit_sha" "$options"
+      _zert_plugin_compile "$plugin_dir"
+      ;;
+
+    checkout)
+      local lock_entry
+      lock_entry="$(_zert_lockfile_read_entry "$plugin_id")"
+      local -a parts
+      parts=("${(@s/::/)lock_entry}")
+      local locked_sha="${parts[4]}"
+
+      local git_output
+      git_output="$(git -C "$plugin_dir" checkout "$locked_sha" 2>&1)" || {
+        _zert_ui_error "Failed to checkout locked commit: $locked_sha"
+        _zert_ui_error "Git output: $git_output"
+        return 1
+      }
+      _zert_plugin_compile "$plugin_dir"
+      ;;
+
+    update)
+      local git_output
+      git_output="$(git -C "$plugin_dir" pull --ff-only 2>&1)" || {
+        git_output="$(git -C "$plugin_dir" fetch origin 2>&1)" || {
+          _zert_ui_error "Failed to update plugin: $plugin_id"
+          _zert_ui_error "Git output: $git_output"
+          return 1
+        }
+      }
+
+      # Update lockfile with new commit
+      local commit_sha=""
+      commit_sha="$(git -C "$plugin_dir" rev-parse HEAD 2>/dev/null)"
+      _zert_lockfile_write_entry "$plugin_id" "$source_type" "$source_value" "$commit_sha" "$options"
+
+      _zert_plugin_compile "$plugin_dir"
+      ;;
+
+    *)
+      # Already synced, nothing to do
+      ;;
+  esac
+
+  return 0
+}

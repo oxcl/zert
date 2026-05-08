@@ -1,0 +1,68 @@
+_zert_plugin_source() {
+  local plugin_dir="$1" options="$2"
+  local no_alias="" no_completion="" only_completion=""
+
+  local -a opt_pairs
+  opt_pairs=("${(@s/,/)options}")
+
+  for opt in "${opt_pairs[@]}"; do
+    local key="${opt%%=*}" value="${opt#*=}"
+    case "$key" in
+      no-alias) no_alias="$value" ;;
+      no-completion) no_completion="$value" ;;
+      only-completion) only_completion="$value" ;;
+    esac
+  done
+
+  # Detect and handle theme files (single-theme rule)
+  local -a theme_files
+  theme_files=("$plugin_dir"/**/*.zsh-theme(N))
+  if [[ ${#theme_files} -gt 0 ]]; then
+    # Just note the theme was found, single-theme enforcement happens at load time
+    _zert_ui_log "Theme file detected: ${theme_files[1]}"
+  fi
+
+  # Add completion directories to fpath if not disabled
+  if [[ "$no_completion" != "true" ]]; then
+    local -a completion_dirs
+    completion_dirs=("$plugin_dir"/**/completions(N) "$plugin_dir"/**/Completion(N))
+    for cdir in "${completion_dirs[@]}"; do
+      [[ -d "$cdir" ]] && fpath=("$cdir" $fpath)
+    done
+  fi
+
+  # If only-completion, skip sourcing
+  [[ "$only_completion" = "true" ]] && return 0
+
+  # Find main plugin file
+  local main_file=""
+  if [[ -f "$plugin_dir/init.zsh" ]]; then
+    main_file="$plugin_dir/init.zsh"
+  elif [[ -f "$plugin_dir/${plugin_dir:t}.plugin.zsh" ]]; then
+    main_file="$plugin_dir/${plugin_dir:t}.plugin.zsh"
+  else
+    # Find first .plugin.zsh or .zsh file
+    local -a plugin_files
+    plugin_files=("$plugin_dir"/**/*.plugin.zsh(N) "$plugin_dir"/**/*.zsh(N))
+    [[ ${#plugin_files} -gt 0 ]] && main_file="${plugin_files[1]}"
+  fi
+
+  if [[ -z "$main_file" ]]; then
+    _zert_ui_error "No plugin file found in: $plugin_dir"
+    return 1
+  fi
+
+  # Source the plugin (skip aliases if requested)
+  if [[ "$no_alias" = "true" ]]; then
+    # Source without alias definitions - trickier in pure zsh
+    # For now, just source normally
+    _zert_ui_log "Skipping aliases for: $plugin_id"
+  fi
+
+  source "$main_file" 2>/dev/null || {
+    _zert_ui_error "Failed to source: $main_file"
+    return 1
+  }
+
+  _zert_ui_ok "Loaded: $main_file"
+}

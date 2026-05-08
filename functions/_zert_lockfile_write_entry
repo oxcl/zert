@@ -1,0 +1,36 @@
+_zert_lockfile_write_entry() {
+  local plugin_id="$1" source="$2" url="$3" commit_sha="$4" options="$5"
+
+  local tmpfile="${ZERT_LOCKFILE}.tmp.$$"
+  local found=0
+
+  # Write header
+  print "# AUTO-GENERATED FILE. DO NOT EDIT MANUALLY." > "$tmpfile"
+  print "# Commit this file to version control for reproducible installs." >> "$tmpfile"
+  print "version::1" >> "$tmpfile"
+
+  if [[ -f "$ZERT_LOCKFILE" ]]; then
+    local line
+    while IFS= read -r line; do
+      [[ "$line" = \#* || -z "$line" ]] && continue
+      [[ "$line" = version::* ]] && continue
+
+      local -a parts
+      parts=("${(@s/::/)line}")
+
+      if [[ "${parts[1]}" = "$plugin_id" ]]; then
+        # Replace existing entry
+        print "${plugin_id}::${source}::${url}::${commit_sha}::${options}" >> "$tmpfile"
+        found=1
+      else
+        print "$line" >> "$tmpfile"
+      fi
+    done < "$ZERT_LOCKFILE"
+  fi
+
+  if [[ $found -eq 0 ]]; then
+    print "${plugin_id}::${source}::${url}::${commit_sha}::${options}" >> "$tmpfile"
+  fi
+
+  mv "$tmpfile" "$ZERT_LOCKFILE"
+}

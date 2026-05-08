@@ -1,0 +1,53 @@
+_zert_parse_flags() {
+  local -a flags
+  local branch="" pin="" no_alias="" no_completion="" only_completion=""
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --branch)
+        shift
+        branch="$1"
+        ;;
+      --pin)
+        shift
+        pin="$1"
+        ;;
+      --no-alias)
+        no_alias="true"
+        ;;
+      --no-completion)
+        no_completion="true"
+        ;;
+      --only-completion)
+        only_completion="true"
+        ;;
+      *)
+        # Not a flag, skip
+        ;;
+    esac
+    shift
+  done
+
+  local options=""
+  if [[ -n "$branch" ]]; then
+    options="${options}branch=$branch"
+  fi
+  if [[ -n "$pin" ]]; then
+    [[ -n "$options" ]] && options="$options,"
+    options="${options}pin=$pin"
+  fi
+  if [[ -n "$no_alias" ]]; then
+    [[ -n "$options" ]] && options="$options,"
+    options="${options}no-alias=$no_alias"
+  fi
+  if [[ -n "$no_completion" ]]; then
+    [[ -n "$options" ]] && options="$options,"
+    options="${options}no-completion=$no_completion"
+  fi
+  if [[ -n "$only_completion" ]]; then
+    [[ -n "$options" ]] && options="$options,"
+    options="${options}only-completion=$only_completion"
+  fi
+
+  print -n "$options"
+}

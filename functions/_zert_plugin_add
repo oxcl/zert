@@ -1,8 +1,55 @@
-# Internal function to add a plugin after parsing
+# Internal function to add a plugin - runs on every shell load
+# Must be silent on success, only act when necessary
 _zert_plugin_add() {
-  local source_type="$1" source_value="$2"
+  local source_type="$1"
+  local source_value="$2"
   shift 2
 
-  _zert_ui_log "Adding plugin: $source_value (type: $source_type)"
-  _zert_ui_log "Not yet implemented"
+  # Parse flags
+  local options
+  options="$(_zert_parse_flags "$@")"
+
+  # Generate plugin_id
+  local plugin_id
+  plugin_id="$(_zert_plugin_sanitize_id "$source_type" "$source_value")"
+  if [[ -z "$plugin_id" ]]; then
+    _zert_ui_error "Failed to generate plugin ID for: $source_value"
+    return 1
+  fi
+
+  # Check if already loaded in this session
+  if [[ "${__ZERT_LOADED_PLUGINS[(i)$plugin_id]}" -le ${#__ZERT_LOADED_PLUGINS} ]]; then
+    return 0
+  fi
+
+  # Step 1: Check if plugin exists, clone if not
+  if ! _zert_plugin_ensure_exists "$plugin_id"; then
+    _zert_plugin_clone "$plugin_id" "$source_type" "$source_value" "$options" || {
+      _zert_ui_error "Failed to clone plugin: $plugin_id"
+      return 1
+    }
+  fi
+
+  # Step 2: Determine what sync action is needed
+  local sync_action
+  sync_action="$(_zert_plugin_ensure_sync "$plugin_id" "$source_type" "$source_value" "$options")"
+
+  # Step 3: Perform sync if needed (handles register, checkout, update, compile)
+  if [[ "$sync_action" != "synced" ]]; then
+    _zert_plugin_sync "$plugin_id" "$source_type" "$source_value" "$options" "$sync_action" || {
+      _zert_ui_error "Failed to sync plugin: $plugin_id"
+      return 1
+    }
+  fi
+
+  # Step 4: Source the plugin (always source for this session)
+  _zert_plugin_source "$ZERT_PLUGINS_DIR/$plugin_id" "$options" || {
+    _zert_ui_error "Failed to source plugin: $plugin_id"
+    return 1
+  }
+
+  # Add to loaded plugins
+  __ZERT_LOADED_PLUGINS+=("$plugin_id")
+
+  return 0
 }
