@@ -1,12 +1,13 @@
-_zert_ui_subtask_log() {
-  local max_lines="${1:-4}"
+_zert_ui_subtask_log(){
+    local max_lines="${1:-4}"
+    echo "log_max=$max_lines" >&4
 
-  print -u4 "log_max=$max_lines"
+    # Use stdbuf + tr to reduce buffering, and force flush after each line
+    stdbuf -o0 -i0 tr '\r' '\n' | while IFS= read -r line; do
+        [[ -z "$line" ]] && continue
 
-  stdbuf -o0 -i0 tr '\r' '\n' | while IFS= read -r line; do
-    [[ -z "$line" ]] && continue
-
-    print -u4 "log_line=$(printf '%s' "$line" | base64)"
-    print -n -u4 ''
-  done
+        # Send to renderer with flush
+        echo "log_line=$(printf '%s' "$line" | base64)" >&4
+        echo -n '' >&4   # force flush by writing empty string
+    done
 }

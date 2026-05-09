@@ -1,18 +1,17 @@
-_zert_ui_pick_spinner() {
-  local i="$1"
-  local idx=$(( i % 10 ))
-  local ch=''
-  case $idx in
-    0) ch='⠋' ;;
-    1) ch='⠙' ;;
-    2) ch='⠹' ;;
-    3) ch='⠸' ;;
-    4) ch='⠼' ;;
-    5) ch='⠴' ;;
-    6) ch='⠦' ;;
-    7) ch='⠧' ;;
-    8) ch='⠇' ;;
-    9) ch='⠏' ;;
-  esac
-  printf "$ch"
+_zert_ui_pick_spinner(){
+    local i="$1"
+    idx=$(( i % 10 ))
+    case $idx in
+            0) ch='⠋' ;;
+            1) ch='⠙' ;;
+            2) ch='⠹' ;;
+            3) ch='⠸' ;;
+            4) ch='⠼' ;;
+            5) ch='⠴' ;;
+            6) ch='⠦' ;;
+            7) ch='⠧' ;;
+            8) ch='⠇' ;;
+            9) ch='⠏' ;;
+    esac
+    printf "$ch"
 }
