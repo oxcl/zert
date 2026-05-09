@@ -210,9 +210,6 @@ function _zert_ui_subtask_log(){
     stdbuf -o0 -i0 tr '\r' '\n' | while IFS= read -r line; do
         [[ -z "$line" ]] && continue
 
-        # Optional: write to debug file
-        echo "$line" >> ./tmp.log
-
         # Send to renderer with flush
         echo "log_line=$(printf '%s' "$line" | base64)" >&4
         echo -n '' >&4   # force flush by writing empty string
