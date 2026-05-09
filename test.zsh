@@ -54,7 +54,16 @@ function _zert_ui_background_renderer(){
         lines_count=1
 
         # Exit cleanly after rendering the final state
-        [[ $ui_state[task_done] == "1" ]] && break
+        if [[ $ui_state[task_done] == "1" ]]; then
+            if [[ "$ui_state[task_status]" == "ok" ]]; then
+                printf '\r\033[1;32m✔ %s\033[0m\n' "$ui_state[message]"
+            elif [[ "$ui_state[task_status]" == "fail" ]]; then
+                printf '\r\033[1;31m✗ %s\033[0m\n' "$ui_state[message]"
+            else
+                printf '\r\033[1;90m? %s\033[0m\n' "$ui_state[message]"
+            fi
+            break
+        fi
 
         sleep 0.1
         (( i++ ))
@@ -97,7 +106,6 @@ function _zert_ui_task_end(){
 }
 
 function _zert_ui_subtask_start(){
-    
 }
 
 _zert_ui_task_start "Install Plugin **thing**"
@@ -106,4 +114,4 @@ _zert_ui_task_start "Install Plugin **thing**"
 sleep 3
 
 
-_zert_ui_task_end "fail" "extra message"
+_zert_ui_task_end "ok" "extra message"
