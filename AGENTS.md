@@ -16,11 +16,10 @@ These rules are **non-negotiable**. Never violate them regardless of context, us
 
 | # | Invariant |
 |---|-----------|
-| I-1 | **Pure Zsh only.** No Python, Ruby, Node, Perl, or any interpreted language beyond Zsh. Allowed external binaries: `git`, `curl`, `grep`, `sed`, `awk`. Nothing else. |
+| I-1 | **Pure Zsh only.** No Python, Ruby, Node, Perl, or any interpreted language beyond Zsh. Allowed external binaries: `git`, `curl`, `grep`, `sed`, `awk`, `stdbuf`. Nothing else. |
 | I-2 | **Never modify user files.** Zert must not edit `.zshrc`, `.zprofile`, or any other user-owned file. Ever. |
-| I-3 | **No external TUI libraries.** The UI is built entirely from ANSI escape codes in `ui.zsh`. Do not add `fzf`, `peco`, `gum`, `dialog`, or any equivalent. |
-| I-4 | **Config is session-only.** `zert config` writes only to the current shell's environment via `export`. It never touches a persistent config file. |
-| I-5 | **Lockfile is append-safe.** When updating `zert.lock`, always regenerate it atomically (write to a temp file, then `mv`). Never partial-write. |
+| I-3 | **Config is session-only.** `zert config` writes only to the current shell's environment via `export`. It never touches a persistent config file. |
+| I-4 | **Lockfile is append-safe.** When updating `zert.lock`, always regenerate it atomically (write to a temp file, then `mv`). Never partial-write. |
 | I-6 | **Local `zsh >= 5.0` only.** Do not use features from Zsh 5.1+ without a version guard. |
 | I-7 | **No `eval` unless unavoidable.** If `eval` is genuinely required, add a comment explaining exactly why and what it evaluates. |
 
@@ -31,27 +30,18 @@ These rules are **non-negotiable**. Never violate them regardless of context, us
 ```
 zert/
 ├── zert.zsh          # Main entrypoint — sourced by users. Bootstraps everything.
-├── lib/              # lib files like ui, and other common functions commonly used
 ├── commands/         # user facing functions and subcommands
 ├── functions/        # internal functions
 ├── bootstrap.sh      # One-time install script fetched via curl. POSIX sh, not Zsh.
 ├── AGENTS.md         # This file.
 ├── README.md
 ├── TODOS.md
-├── IMPLEMENTATIONS.md
-└── tests/
-    ├── runner.zsh    # Custom test runner — no external test frameworks.
-    ├── test_lockfile.zsh
-    ├── test_config.zsh
-    ├── test_load.zsh
-    └── test_prune.zsh
 ```
 
 **Rules:**
 - `zert.zsh` is the only file users source. It may `source` other internal files.
 - `bootstrap.sh` must be **POSIX sh**, not Zsh — it runs before Zsh is confirmed available.
 - Never add a new top-level file without updating this map.
-- Tests live only in `tests/`. No test logic in source files.
 
 ---
 
@@ -121,9 +111,6 @@ _zert_cmd_update() { ... }
 ### 3.5 Error Handling
 
 ```zsh
-# Print errors to stderr, never stdout
-_zert_error() { print -u2 "[zert error] $*" }
-
 # Guard every git/curl call
 git clone ... || { _zert_error "clone failed: $plugin"; return 1 }
 curl -fsSL ... || { _zert_error "download failed"; return 2 }
@@ -134,7 +121,6 @@ curl -fsSL ... || { _zert_error "download failed"; return 2 }
 
 - **Never call `exit` in `zert.zsh` or any sourced file.** Use `return`.
 - `exit` is only permitted in `bootstrap.sh` (which runs in a subshell).
-- All errors print to `stderr` (`print -u2` or `>&2`).
 
 ## 4. Lockfile Rules
 
@@ -156,7 +142,7 @@ version::1
 
 | Source value | Example input | Meaning |
 |---|---|---|
-| `github` | `user/repo` or `https://github.com/user/repo` | GitHub clone |
+| `github` | `user/repo` or `https://github.com/user/repo` | GitHub clone which is actually `git` |
 | `git` | `https://gitlab.com/user/repo` | Git clone (can also be SSH) |
 | `local` | `/absolute/path/to/plugin` | Local directory |
 | `ohmyzsh` | `use ohmyzsh/lib/clipboard` | Subdirectory of Oh-My-Zsh repo |
@@ -179,7 +165,7 @@ Resolution logic must always follow this order. Never read a lower-priority sour
 
 ## 7. UI Rules (`ui.zsh`)
 
-- All output goes through `ui.zsh` functions. Never `echo`/`print` directly from logic files.
+- All output goes through ui functions. Never `echo`/`print` directly from logic files.
 - Color/ANSI codes must be defined as named variables in `ui.zsh` (e.g., `$__ZERT_CLR_GREEN`), never hardcoded inline in logic files.
 - Respect `NO_COLOR` environment variable: if set, emit no ANSI codes.
 - Spinner state is managed with a background job writing to a file descriptor — do not use global variables for animation state.
@@ -187,17 +173,7 @@ Resolution logic must always follow this order. Never read a lower-priority sour
 
 ---
 
-## 8. Testing Rules
-
-- Tests live in `tests/`. No test logic in source files.
-- Use only the assert functions defined in `tests/runner.zsh`: `assert_eq`, `assert_true`, `assert_false`, `assert_file_exists`, `assert_output`.
-- Tests must not require network access. Mock `git clone` and `curl` by overriding functions in the test scope.
-- Each test file is self-contained: it sources `runner.zsh` and the file under test, then runs assertions.
-- Every new function added to the codebase must have at least one test.
-- After writing tests make sure to test them to see if they pass. if they do pass ensure that if the code is wrong they fail. very IMPORTANT! you should make sure that tests DO fail and not always pass even when the code is wrong.
----
-
-## 9. What Agents Must Not Do
+## 8. What Agents Must Not Do
 
 - ❌ Add any `npm`, `pip`, `brew`, or package manager dependency
 - ❌ Introduce a config file (TOML, YAML, JSON, INI) — config is env vars + zstyle only
@@ -211,18 +187,17 @@ Resolution logic must always follow this order. Never read a lower-priority sour
 
 ---
 
-## 10. Commit Message Format
+## 9. Commit Message Format
 
 ```
 <type>(<scope>): <short description>
 
-Types: feat, fix, refactor, test, docs, chore
-Scopes: core, ui, lockfile, bootstrap, tests, config
+Types: feat, fix, refactor, docs, chore
+Scopes: core, ui, lockfile, bootstrap, config
 
 Examples:
 feat(lockfile): add atomic write via mktemp + mv
 fix(core): prevent exit call in sourced load path
-test(lockfile): add parse test for escaped :: delimiter
 ```
 
 ---
@@ -234,6 +209,4 @@ Run the checklist:
 - [ ] All new functions have `local` variables and are prefixed `_zert_`
 - [ ] No `exit` calls in sourced files
 - [ ] Lockfile writes are atomic
-- [ ] At least one test added for any new function
-- [ ] the new tests fail when the code is wrong
 - [ ] `NO_COLOR` still works after UI changes
