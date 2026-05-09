@@ -67,6 +67,7 @@ function _zert_ui_background_renderer(){
 
         # print subtasks in order (subtask_0, subtask_1, etc.) with tree structure
         subtask_index=0
+        if [[ $ui_state[task_status] == "ongoing" ]]; then
         while [[ -n "${ui_state[subtask_${subtask_index}_title]}" ]]; do
             local subtask_title="${ui_state[subtask_${subtask_index}_title]}"
             local subtask_status="${ui_state[subtask_${subtask_index}_status]}"
@@ -88,6 +89,7 @@ function _zert_ui_background_renderer(){
             (( lines_count++ ))
             (( subtask_index++ ))
         done
+        fi
 
         # Exit cleanly after rendering the final state
         if [[ $ui_state[task_done] == "1" ]]; then
