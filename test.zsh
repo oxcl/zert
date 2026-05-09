@@ -26,6 +26,8 @@ function _zert_ui_background_renderer(){
     local comm_file="$2"
     local lines_count=0 i=0
     typeset -A ui_state
+    typeset -a log_ring
+    local log_max=5
 
     exec 3<>"$comm_file"
 
@@ -33,13 +35,29 @@ function _zert_ui_background_renderer(){
         kill -0 $parent_pid 2>/dev/null || break
 
         # Read all available lines from the FIFO and update the UI state
-        while read -t 0.05 -u 3 line; do
+        while IFS= read -t 0.05 -u 3 line; do
             local key="${line%%=*}"
             local value="${line#*=}"
-            ui_state[$key]="$value"
+            case $key in
+                log_max)
+                    log_max="$(($value +1))"
+                    ;;
+                log_clear)
+                    log_ring=()
+                    ;;
+                log_line)
+                    local decoded="$(printf '%s' "$value" | base64 --decode)"
+                    log_ring+=("$decoded")
+                    (( ${#log_ring[@]} > log_max )) && log_ring=("${log_ring[@]: -$log_max}")
+                    ;;
+                *)
+                    ui_state[$key]="$value"
+                    ;;
+            esac
         done
 
         # Move cursor up to overwrite previous output
+        old_lines_count=$lines_count
         [[ $lines_count -gt 0 ]] && printf "\033[${lines_count}A"
         (( lines_count = 0 ))
 
@@ -65,31 +83,51 @@ function _zert_ui_background_renderer(){
             (( subtask_index++ ))
         done
 
-        # print subtasks in order (subtask_0, subtask_1, etc.) with tree structure
+        # print subtasks in order with tree structure
         subtask_index=0
-        if [[ $ui_state[task_status] == "ongoing" ]]; then
-        while [[ -n "${ui_state[subtask_${subtask_index}_title]}" ]]; do
-            local subtask_title="${ui_state[subtask_${subtask_index}_title]}"
-            local subtask_status="${ui_state[subtask_${subtask_index}_status]}"
-            local is_last_subtask=$(( subtask_index == total_subtasks - 1 ))
-            local tree_prefix="├── "
-            [[ $is_last_subtask -eq 1 ]] && tree_prefix="└── "
-            
-            printf '%s' "$tree_prefix"
-            if [[ "$subtask_status" == "ongoing" ]]; then
-                printf '\033[1;36m%s\e[0m' "$(_zert_ui_pick_spinner $i)"
-            elif [[ "$subtask_status" == "ok" ]]; then
-                printf '\033[1;32m✔\033[0m'
-            elif [[ "$subtask_status" == "fail" ]]; then
-                printf '\033[1;31m✗\033[0m'
-            else
-                printf '\033[1;90m?\033[0m'
-            fi
-            printf ' %s\033[K\n' "$(_zert_ui_emphasize "$subtask_title")"
-            (( lines_count++ ))
-            (( subtask_index++ ))
-        done
+        if [[ $ui_state[task_status] != "ok" ]]; then
+            while [[ -n "${ui_state[subtask_${subtask_index}_title]}" ]]; do
+                local subtask_title="${ui_state[subtask_${subtask_index}_title]}"
+                local subtask_status="${ui_state[subtask_${subtask_index}_status]}"
+                local is_last_subtask=$(( subtask_index == total_subtasks - 1 ))
+                local tree_prefix="├── "
+                [[ $is_last_subtask -eq 1 ]] && tree_prefix="└── "
+
+                printf '%s' "$tree_prefix"
+                if [[ "$subtask_status" == "ongoing" ]]; then
+                    printf '\033[1;36m%s\e[0m' "$(_zert_ui_pick_spinner $i)"
+                elif [[ "$subtask_status" == "ok" ]]; then
+                    printf '\033[1;32m✔\033[0m'
+                elif [[ "$subtask_status" == "fail" ]]; then
+                    printf '\033[1;31m✗\033[0m'
+                else
+                    printf '\033[1;90m?\033[0m'
+                fi
+                printf ' %s\033[K\n' "$(_zert_ui_emphasize "$subtask_title")"
+                (( lines_count++ ))
+                (( subtask_index++ ))
+            done
         fi
+        # print log ring buffer — oldest at top, newest at bottom
+        local ring_len=${#log_ring[@]}
+        if (( ring_len > 0 )); then
+            for (( j=1; j<ring_len; j++ )); do
+                printf ' │ \033[3;90m%s\033[K\033[0m\n' "${log_ring[$j]:0:70}"
+                (( lines_count++ ))
+            done
+            # pad top with blank lines to keep block height stable
+            for (( j=ring_len; j<log_max; j++ )); do
+                printf ' │  \n'
+                (( lines_count++ ))
+            done
+        fi
+
+        # clean up any remaining lines from previous render
+        local extra_lines=$(( old_lines_count - lines_count ))
+        for (( j=0; j<extra_lines; j++ )); do
+            printf '\r\033[K\n'
+        done
+        [[ $extra_lines -gt 0 ]] && printf "\033[${extra_lines}A"
 
         # Exit cleanly after rendering the final state
         if [[ $ui_state[task_done] == "1" ]]; then
@@ -161,13 +199,32 @@ function _zert_ui_subtask_update(){
 function _zert_ui_subtask_end(){
     local subtask_index="$1" subtask_status="$2"
     echo "subtask_${subtask_index}_status=$subtask_status" >&4
+    echo "log_clear=1" >&4
+}
+
+function _zert_ui_subtask_log(){
+    local max_lines="${1:-4}"
+    echo "log_max=$max_lines" >&4
+
+    # Use stdbuf + tr to reduce buffering, and force flush after each line
+    stdbuf -o0 -i0 tr '\r' '\n' | while IFS= read -r line; do
+        [[ -z "$line" ]] && continue
+
+        # Optional: write to debug file
+        echo "$line" >> ./tmp.log
+
+        # Send to renderer with flush
+        echo "log_line=$(printf '%s' "$line" | base64)" >&4
+        echo -n '' >&4   # force flush by writing empty string
+    done
 }
 
 _zert_ui_task_start "Installing Plugin **thing**..."
 
-
 _zert_ui_subtask_start 0 "Cloning repository"
-sleep 1
+
+git clone https://github.com/neovim/neovim.git --progress --verbose /tmp/neovim 2>&1 | _zert_ui_subtask_log 4
+
 _zert_ui_subtask_update 0 "Cloned repository"
 _zert_ui_subtask_end 0 "ok"
 _zert_ui_subtask_start 1 "Building plugin"
@@ -182,4 +239,4 @@ _zert_ui_subtask_end 2 "fail"
 sleep 3
 
 _zert_ui_task_update "Installed **thing**"
-_zert_ui_task_end "ok" "Installation complete"
+_zert_ui_task_end "fail" "Installation complete"
