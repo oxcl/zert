@@ -1,0 +1,14 @@
+_zert_ui_task_end() {
+  local task_status="$1"
+  local message="$2"
+
+  print -u4 "task_status=$task_status"
+  print -u4 "message=$message"
+  print -u4 "task_done=1"
+
+  sleep 0.2
+  wait "$__ZERT_BG_PID" 2>/dev/null
+
+  exec 4>&-
+  rm -f "$__ZERT_COMM_FILE" 2>/dev/null
+}

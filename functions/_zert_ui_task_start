@@ -1,0 +1,18 @@
+_zert_ui_task_start() {
+  local task_name="$1"
+  local comm_file="/tmp/zert_ui_comm_$$"
+  mkfifo "$comm_file" || { print -u2 "Failed to create FIFO"; return 1 }
+
+  __ZERT_COMM_FILE="$comm_file"
+  trap 'rm -f "$__ZERT_COMM_FILE" 2>/dev/null' EXIT INT TERM HUP
+
+  _zert_ui_background_renderer "$$" "$comm_file" &
+  __ZERT_BG_PID="$!"
+
+  exec 4<>"$comm_file"
+
+  sleep 0.05
+
+  print -u4 "task_status=ongoing"
+  print -u4 "task_name=$task_name"
+}

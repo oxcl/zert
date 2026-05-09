@@ -1,0 +1,4 @@
+_zert_ui_task_update() {
+  local task_name="$1"
+  print -u4 "task_name=$task_name"
+}

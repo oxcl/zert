@@ -1,0 +1,6 @@
+_zert_ui_subtask_update() {
+  local subtask_index="$1"
+  local subtask_title="$2"
+
+  print -u4 "subtask_${subtask_index}_title=$subtask_title"
+}

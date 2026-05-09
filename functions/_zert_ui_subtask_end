@@ -1,0 +1,7 @@
+_zert_ui_subtask_end() {
+  local subtask_index="$1"
+  local subtask_status="$2"
+
+  print -u4 "subtask_${subtask_index}_status=$subtask_status"
+  print -u4 "log_clear=1"
+}
