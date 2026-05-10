@@ -15,7 +15,7 @@ _zert_parse_source() {
 
   # Local path (absolute path starting with /)
   if [[ "$input" = /* ]]; then
-    if [[ ! -d "$input" ]]; then
+    if [[ ! -d "$input" ]] && [[ ! -f "$input" ]]; then
       _zert_ui_error "Local path does not exist: $input"
       return 1
     fi

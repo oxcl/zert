@@ -1,8 +1,16 @@
 _zert_plugin_ensure_exists() {
-  local plugin_id="$1"
-  local plugin_dir="$ZERT_PLUGINS_DIR/$plugin_id"
+  local source_type="$1"
+  local source_value="$2"
 
-  [[ -d "$plugin_dir/" ]] && return 0
-  [[ -f "$plugin_dir" ]] && return 0
+  if [[ "$source_type" == "local" ]]; then
+    [[ -d "$source_value" ]] && return 0
+    [[ -f "$source_value" ]] && return 0
+    return 1
+  else
+    local plugin_id="$(_zert_plugin_sanitize_id "$source_type" "$source_value")"
+    local plugin_dir="$ZERT_PLUGINS_DIR/$plugin_id"
+    [[ -d "$plugin_dir/" ]] && return 0
+    [[ -f "$plugin_dir" ]] && return 0
+  fi
   return 1
 }

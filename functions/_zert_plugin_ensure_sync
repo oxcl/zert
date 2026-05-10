@@ -1,6 +1,12 @@
 _zert_plugin_ensure_sync() {
   local plugin_id="$1" source_type="$2" source_value="$3"
   shift 3
+
+  if [[ "$source_type" == "local" ]]; then
+    print -n "synced"
+    return 0
+  fi
+
   local plugin_dir="$ZERT_PLUGINS_DIR/$plugin_id"
 
   local branch pin

@@ -13,10 +13,14 @@ _zert_plugin_add() {
     return 0
   fi
 
-  local plugin_dir="$ZERT_PLUGINS_DIR/$plugin_id"
+  if [[ "$source_type" == "local" ]]; then
+    local plugin_dir="$source_value"
+  else
+    local plugin_dir="$ZERT_PLUGINS_DIR/$plugin_id"
+  fi
 
   local plugin_exists=true
-  _zert_plugin_ensure_exists "$plugin_id" || plugin_exists=false
+  _zert_plugin_ensure_exists "$source_type" "$source_value" || plugin_exists=false
 
   local sync_action="synced"
   $plugin_exists && sync_action="$(_zert_plugin_ensure_sync "$plugin_id" "$source_type" "$source_value" "$@")"
