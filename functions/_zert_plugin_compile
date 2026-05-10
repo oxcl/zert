@@ -3,15 +3,11 @@ _zert_plugin_compile() {
 
   [[ ! -d "$plugin_dir" ]] && return 1
 
-  # Remove old .zwc files
-  find "$plugin_dir" -name "*.zwc" -type f -delete 2>/dev/null
-
-  # Find all .zsh files and compile them
   local -a zsh_files
-  zsh_files=("$plugin_dir"/**/*.zsh(N) "$plugin_dir"/**/*.plugin.zsh(N) "$plugin_dir"/**/init.zsh(N))
+  zsh_files=("$plugin_dir"/**/*.zsh(N))
 
   for zsh_file in "${zsh_files[@]}"; do
     [[ -f "$zsh_file" ]] || continue
-    zcompile "$zsh_file.zwc" "$zsh_file" 2>/dev/null && _zert_ui_ok "Compiled: $zsh_file"
+    zcompile "$zsh_file.zwc" "$zsh_file" 2>&1
   done
 }

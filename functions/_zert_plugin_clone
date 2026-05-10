@@ -1,42 +1,18 @@
 _zert_plugin_clone() {
-  local plugin_id="$1" source_type="$2" source_value="$3" options="$4"
+  local plugin_id="$1" source_type="$2" source_value="$3"
+  shift 3
   local plugin_dir="$ZERT_PLUGINS_DIR/$plugin_id"
-
-  _zert_ui_log "Cloning plugin: $plugin_id"
 
   mkdir -p "$ZERT_PLUGINS_DIR" 2>/dev/null
 
-  local clone_args="--filter=tree:0"
-  local branch=""
-  local pin=""
-  local -a opt_pairs
-  opt_pairs=("${(@s/,/)options}")
+  local clone_args=("--filter=tree:0" --progress --verbose)
+  local branch pin
+  branch="$(_zert_parse_flags "$@" "branch")"
+  pin="$(_zert_parse_flags "$@" "pin")"
 
-  for opt in "${opt_pairs[@]}"; do
-    local key="${opt%%=*}" value="${opt#*=}"
-    case "$key" in
-      branch) branch="$value" ;;
-      pin) pin="$value" ;;
-    esac
-  done
+  [[ -n "$branch" ]] && clone_args=($clone_args "--branch" "$branch")
 
-  [[ -n "$branch" ]] && clone_args="$clone_args --branch $branch"
+  git clone ${clone_args[@]} "$source_value" "$plugin_dir" 2>&1 || return 1
 
-  local git_output
-  git_output="$(git clone $clone_args "$source_value" "$plugin_dir" 2>&1)" || {
-    _zert_ui_error "Failed to clone: $source_value"
-    _zert_ui_error "Git output: $git_output"
-    return 1
-  }
-
-  if [[ -n "$pin" ]]; then
-    git_output="$(git -C "$plugin_dir" checkout "$pin" 2>&1)" || {
-      _zert_ui_error "Failed to checkout pinned commit: $pin"
-      _zert_ui_error "Git output: $git_output"
-      return 1
-    }
-  fi
-
-  _zert_plugin_compile "$plugin_dir"
   return 0
 }

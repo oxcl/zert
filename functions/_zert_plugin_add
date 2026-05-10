@@ -1,15 +1,7 @@
-# Internal function to add a plugin - runs on every shell load
-# Must be silent on success, only act when necessary
 _zert_plugin_add() {
-  local source_type="$1"
-  local source_value="$2"
+  local source_type="$1" source_value="$2"
   shift 2
 
-  # Parse flags
-  local options
-  options="$(_zert_parse_flags "$@")"
-
-  # Generate plugin_id
   local plugin_id
   plugin_id="$(_zert_plugin_sanitize_id "$source_type" "$source_value")"
   if [[ -z "$plugin_id" ]]; then
@@ -17,39 +9,121 @@ _zert_plugin_add() {
     return 1
   fi
 
-  # Check if already loaded in this session
   if [[ "${__ZERT_LOADED_PLUGINS[(i)$plugin_id]}" -le ${#__ZERT_LOADED_PLUGINS} ]]; then
     return 0
   fi
 
-  # Step 1: Check if plugin exists, clone if not
-  if ! _zert_plugin_ensure_exists "$plugin_id"; then
-    _zert_plugin_clone "$plugin_id" "$source_type" "$source_value" "$options" || {
-      _zert_ui_error "Failed to clone plugin: $plugin_id"
-      return 1
-    }
+  local plugin_dir="$ZERT_PLUGINS_DIR/$plugin_id"
+
+  local plugin_exists=true
+  _zert_plugin_ensure_exists "$plugin_id" || plugin_exists=false
+
+  local sync_action="synced"
+  $plugin_exists && sync_action="$(_zert_plugin_ensure_sync "$plugin_id" "$source_type" "$source_value" "$@")"
+
+  if $plugin_exists && [[ "$sync_action" == "synced" ]]; then
+    _zert_plugin_source "$plugin_dir" "$@" || return 1
+    __ZERT_LOADED_PLUGINS+=("$plugin_id")
+    return 0
   fi
 
-  # Step 2: Determine what sync action is needed
-  local sync_action
-  sync_action="$(_zert_plugin_ensure_sync "$plugin_id" "$source_type" "$source_value" "$options")"
+  _zert_ui_task_start "Configuring plugin **${plugin_id}**..."
+  local subtask_idx=0
 
-  # Step 3: Perform sync if needed (handles register, checkout, update, compile)
+  if ! $plugin_exists; then
+    _zert_ui_subtask_start $subtask_idx "Cloning repository"
+    _zert_plugin_clone "$plugin_id" "$source_type" "$source_value" "$@" | _zert_ui_subtask_log 4
+    if [[ ${pipestatus[1]} -ne 0 ]]; then
+      _zert_ui_subtask_update $subtask_idx "Clone failed!"
+      _zert_ui_subtask_end $subtask_idx "fail"
+      _zert_ui_task_end "fail" "failed to clone the repository with git."
+      return 1
+    fi
+    _zert_ui_subtask_update $subtask_idx "Cloned repository"
+    _zert_ui_subtask_end $subtask_idx "ok"
+    (( subtask_idx++ ))
+  fi
+
+  sync_action="$(_zert_plugin_ensure_sync "$plugin_id" "$source_type" "$source_value" "$@")"
+  echo sync_action="$sync_action" >> "./tmp.log"
   if [[ "$sync_action" != "synced" ]]; then
-    _zert_plugin_sync "$plugin_id" "$source_type" "$source_value" "$options" "$sync_action" || {
-      _zert_ui_error "Failed to sync plugin: $plugin_id"
+    _zert_ui_subtask_start $subtask_idx "Cleaning compiled files"
+    find "$plugin_dir" -name "*.zwc" -type f -delete  2>&1 | _zert_ui_subtask_log 4
+    if [[ ${pipestatus[1]} -ne 0 ]]; then
+      _zert_ui_subtask_update $subtask_idx "Cleaning compiled files failed!"
+      _zert_ui_subtask_end $subtask_idx "fail"
+      _zert_ui_task_end "fail" "failed to clean compiled files."
       return 1
-    }
+    fi
+
+
+    case "$sync_action" in
+      register)
+        _zert_ui_subtask_start $subtask_idx "Registering plugin in lockfile"
+        _zert_plugin_register "$plugin_id" "$source_type" "$source_value" "$@" | _zert_ui_subtask_log 4
+        if [[ ${pipestatus[1]} -ne 0 ]]; then
+          _zert_ui_subtask_update $subtask_idx "Registering plugin in lockfile failed!"
+          _zert_ui_subtask_end $subtask_idx "fail"
+          _zert_ui_task_end "fail" "failed to register plugin in lockfile."
+          return 1
+        fi
+        _zert_ui_subtask_update $subtask_idx "Registered plugin in lockfile"
+        _zert_ui_subtask_end $subtask_idx "ok"
+        (( subtask_idx++ ))
+        ;;
+      checkout)
+        _zert_ui_subtask_start $subtask_idx "Checking out locked version"
+        _zert_plugin_checkout "$plugin_id" "$source_type" "$source_value" "$@" | _zert_ui_subtask_log 4
+        if [[ ${pipestatus[1]} -ne 0 ]]; then
+          _zert_ui_subtask_update $subtask_idx "Checking out locked version failed!"
+          _zert_ui_subtask_end $subtask_idx "fail"
+          _zert_ui_task_end "fail" "failed to checkout locked version."
+          return 1
+        fi
+        _zert_ui_subtask_update $subtask_idx "Checked out locked version"
+        _zert_ui_subtask_end $subtask_idx "ok"
+        (( subtask_idx++ ))
+        ;;
+      pull)
+        _zert_ui_subtask_start $subtask_idx "Pulling to match locked version"
+        _zert_plugin_pull     "$plugin_id" "$source_type" "$source_value" "$@" | _zert_ui_subtask_log 4
+        if [[ ${pipestatus[1]} -ne 0 ]]; then
+          _zert_ui_subtask_update $subtask_idx "Pulling to match locked version failed!"
+          _zert_ui_subtask_end $subtask_idx "fail"
+          _zert_ui_task_end "fail" "failed to pull to match locked version."
+          return 1
+        fi
+        _zert_ui_subtask_update $subtask_idx "Pulled to match locked version"
+        _zert_ui_subtask_end $subtask_idx "ok"
+        (( subtask_idx++ ))
+        ;;
+    esac
+    _zert_ui_subtask_start $subtask_idx "Compiling files"
+    _zert_plugin_compile "$plugin_dir" 2>&1 | _zert_ui_subtask_log 4
+    if [[ ${pipestatus[1]} -ne 0 ]]; then
+      _zert_ui_subtask_update $subtask_idx "Compiling files failed!"
+      _zert_ui_subtask_end $subtask_idx "fail"
+      _zert_ui_task_end "fail" "failed to compile plugin files."
+      return 1
+    fi
+    _zert_ui_subtask_update $subtask_idx "Compiled files"
+    _zert_ui_subtask_end $subtask_idx "ok"
+    (( subtask_idx++ ))
   fi
 
-  # Step 4: Source the plugin (always source for this session)
-  _zert_plugin_source "$ZERT_PLUGINS_DIR/$plugin_id" "$options" || {
-    _zert_ui_error "Failed to source plugin: $plugin_id"
+  _zert_ui_subtask_start $subtask_idx "Sourcing plugin"
+  _zert_plugin_source "$plugin_dir" "$@" || {
+    _zert_ui_subtask_update $subtask_idx "Sourcing plugin failed!"
+    _zert_ui_subtask_end $subtask_idx "fail"
+    _zert_ui_task_end "fail" "failed to source plugin after configuration."
     return 1
   }
+  _zert_ui_subtask_update $subtask_idx "Sourced plugin"
+  _zert_ui_subtask_end $subtask_idx "ok"
 
-  # Add to loaded plugins
+  _zert_ui_task_update "Configured plugin **${plugin_id}**"
+  _zert_ui_task_end "ok"
+
   __ZERT_LOADED_PLUGINS+=("$plugin_id")
-
   return 0
 }

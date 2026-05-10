@@ -1,50 +1,52 @@
 _zert_plugin_source() {
-  local plugin_dir="$1" options="$2"
-  local no_alias="" no_completion="" only_completion=""
+  local plugin_dir="$1"
+  shift
 
-  local -a opt_pairs
-  opt_pairs=("${(@s/,/)options}")
+  local no_alias no_completion only_completion
+  no_alias="$(_zert_parse_flags "$@" "no-alias")"
+  no_completion="$(_zert_parse_flags "$@" "no-completion")"
+  only_completion="$(_zert_parse_flags "$@" "only-completion")"
 
-  for opt in "${opt_pairs[@]}"; do
-    local key="${opt%%=*}" value="${opt#*=}"
-    case "$key" in
-      no-alias) no_alias="$value" ;;
-      no-completion) no_completion="$value" ;;
-      only-completion) only_completion="$value" ;;
-    esac
-  done
-
-  # Detect and handle theme files (single-theme rule)
-  local -a theme_files
-  theme_files=("$plugin_dir"/**/*.zsh-theme(N))
-  if [[ ${#theme_files} -gt 0 ]]; then
-    # Just note the theme was found, single-theme enforcement happens at load time
-    _zert_ui_log "Theme file detected: ${theme_files[1]}"
-  fi
-
-  # Add completion directories to fpath if not disabled
   if [[ "$no_completion" != "true" ]]; then
-    local -a completion_dirs
-    completion_dirs=("$plugin_dir"/**/completions(N) "$plugin_dir"/**/Completion(N))
-    for cdir in "${completion_dirs[@]}"; do
-      [[ -d "$cdir" ]] && fpath=("$cdir" $fpath)
-    done
+    fpath=("$plugin_dir" $fpath)
+    [[ -d "$plugin_dir/completions" ]] && fpath=("$plugin_dir/completions" $fpath)
   fi
 
-  # If only-completion, skip sourcing
   [[ "$only_completion" = "true" ]] && return 0
 
-  # Find main plugin file
+  [[ -d "$plugin_dir/functions" ]] && fpath=("$plugin_dir/functions" $fpath)
+
+  local -a theme_files
+  theme_files=("$plugin_dir"/*.zsh-theme(N))
+  if [[ ${#theme_files} -gt 0 ]]; then
+    source "${theme_files[1]}" || {
+      _zert_ui_error "Failed to source theme: ${theme_files[1]}"
+      return 1
+    }
+    return 0
+  fi
+
   local main_file=""
-  if [[ -f "$plugin_dir/init.zsh" ]]; then
+  local plugin_name="${plugin_dir:t}"
+
+  if [[ -f "$plugin_dir/$plugin_name.plugin.zsh" ]]; then
+    main_file="$plugin_dir/$plugin_name.plugin.zsh"
+  elif [[ -f "$plugin_dir/init.zsh" ]]; then
     main_file="$plugin_dir/init.zsh"
-  elif [[ -f "$plugin_dir/${plugin_dir:t}.plugin.zsh" ]]; then
-    main_file="$plugin_dir/${plugin_dir:t}.plugin.zsh"
   else
-    # Find first .plugin.zsh or .zsh file
-    local -a plugin_files
-    plugin_files=("$plugin_dir"/**/*.plugin.zsh(N) "$plugin_dir"/**/*.zsh(N))
-    [[ ${#plugin_files} -gt 0 ]] && main_file="${plugin_files[1]}"
+    local -a candidates
+    candidates=("$plugin_dir"/*.plugin.zsh(N))
+    if [[ ${#candidates} -gt 0 ]]; then
+      main_file="${candidates[1]}"
+    else
+      candidates=("$plugin_dir"/*.zsh(N))
+      if [[ ${#candidates} -gt 0 ]]; then
+        main_file="${candidates[1]}"
+      else
+        candidates=("$plugin_dir"/*.sh(N))
+        [[ ${#candidates} -gt 0 ]] && main_file="${candidates[1]}"
+      fi
+    fi
   fi
 
   if [[ -z "$main_file" ]]; then
@@ -52,17 +54,16 @@ _zert_plugin_source() {
     return 1
   fi
 
-  # Source the plugin (skip aliases if requested)
-  if [[ "$no_alias" = "true" ]]; then
-    # Source without alias definitions - trickier in pure zsh
-    # For now, just source normally
-    _zert_ui_log "Skipping aliases for: $plugin_id"
+  if [[ "$no_alias" == "true" ]]; then
+    function alias() { :; }
   fi
-
-  source "$main_file" 2>/dev/null || {
+  source "$main_file" || {
     _zert_ui_error "Failed to source: $main_file"
     return 1
   }
+  if [[ "$no_alias" == "true" ]]; then
+    unfunction alias
+  fi
 
-  _zert_ui_ok "Loaded: $main_file"
+  return 0
 }

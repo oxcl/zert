@@ -1,32 +1,59 @@
 _zert_plugin_ensure_sync() {
-  local plugin_id="$1" source_type="$2" source_value="$3" options="$4"
+  local plugin_id="$1" source_type="$2" source_value="$3"
+  shift 3
   local plugin_dir="$ZERT_PLUGINS_DIR/$plugin_id"
 
-  # Check lockfile entry
+  local branch pin
+  branch="$(_zert_parse_flags "$@" "branch")"
+  pin="$(_zert_parse_flags "$@" "pin")"
+
   local lock_entry
   lock_entry="$(_zert_lockfile_read_entry "$plugin_id")"
 
   if [[ -n "$lock_entry" ]]; then
-    # Lockfile exists - ensure commit matches
     local -a parts
     parts=("${(@s/::/)lock_entry}")
     local locked_sha="${parts[4]}"
+    local lock_options="${parts[5]}"
+
+    local -a opt_pairs
+    opt_pairs=("${(@s/,/)lock_options}")
+    local lock_branch="" lock_pin=""
+    for opt in "${opt_pairs[@]}"; do
+      local key="${opt%%=*}" value="${opt#*=}"
+      case "$key" in
+        branch) lock_branch="$value" ;;
+        pin)    lock_pin="$value" ;;
+      esac
+    done
+
+    if [[ -n "$branch" && "$lock_branch" != "$branch" ]]; then
+      print -n "checkout"
+      return 0
+    fi
+
+    if [[ -n "$pin" && "$lock_pin" != "$pin" ]]; then
+      print -n "checkout"
+      return 0
+    fi
 
     if [[ -n "$locked_sha" ]]; then
       local current_sha=""
       current_sha="$(git -C "$plugin_dir" rev-parse HEAD 2>/dev/null)"
 
       if [[ "$current_sha" != "$locked_sha" ]]; then
-        print -n "checkout"
+        if git -C "$plugin_dir" cat-file -e "$locked_sha" 2>/dev/null; then
+          print -n "checkout"
+        else
+          print -n "pull"
+        fi
         return 0
       fi
     fi
   else
-    # No lockfile entry - need to register
     print -n "register"
     return 0
   fi
 
-  # Plugin is in sync
   print -n "synced"
 }

@@ -3,9 +3,10 @@ _zert_ui_task_start(){
     mkfifo "$comm_file" || { echo "Failed to create FIFO"; exit 1 }
     
     __ZERT_COMM_FILE="$comm_file"
-    trap 'rm -f "$__ZERT_COMM_FILE" 2>/dev/null' EXIT INT TERM HUP
+    trap 'rm -f "$__ZERT_COMM_FILE" 2>/dev/null' EXIT
 
     # Start the renderer
+    setopt LOCAL_OPTIONS NO_NOTIFY NO_MONITOR
     _zert_ui_background_renderer "$$" "$comm_file" &
     __ZERT_BG_PID="$!"
 

@@ -13,10 +13,13 @@ zert() {
   # Dispatch to subcommand handler (autoloaded from commands/)
   if functions "_zert_cmd_$cmd" >/dev/null 2>&1; then
     "_zert_cmd_$cmd" "$@"
-  elif [[ "$cmd" = "use" ]]; then
-    _zert_cmd_use "$@"
   else
     # Try to parse as plugin source
-    _zert_parse_source "$cmd" && _zert_plugin_add "$__ZERT_SOURCE_TYPE" "$__ZERT_SOURCE_VALUE" "$@"
+    if _zert_parse_source "$cmd"; then 
+      _zert_plugin_add "$__ZERT_SOURCE_TYPE" "$__ZERT_SOURCE_VALUE" "$@"
+    else
+      _zert_ui_error "Unknown command: $cmd"
+      return 1
+    fi
   fi
 }

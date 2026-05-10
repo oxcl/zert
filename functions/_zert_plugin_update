@@ -1,0 +1,15 @@
+_zert_plugin_update() {
+  local plugin_id="$1" source_type="$2" source_value="$3"
+  shift 3
+  local plugin_dir="$ZERT_PLUGINS_DIR/$plugin_id"
+
+  git -C "$plugin_dir" pull --ff-only 2>&1 || {
+    git -C "$plugin_dir" fetch origin 2>&1 || return 1
+  }
+
+  local commit_sha=""
+  commit_sha="$(git -C "$plugin_dir" rev-parse HEAD 2>/dev/null)"
+  local options="$(_zert_parse_flags "$@" "")"
+  _zert_lockfile_write_entry "$plugin_id" "$source_type" "$source_value" "$commit_sha" "$options"
+  return 0
+}

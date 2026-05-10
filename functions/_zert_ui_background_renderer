@@ -62,29 +62,27 @@ _zert_ui_background_renderer(){
 
         # print subtasks in order with tree structure
         subtask_index=0
-        if [[ $ui_state[task_status] != "ok" ]]; then
-            while [[ -n "${ui_state[subtask_${subtask_index}_title]}" ]]; do
-                local subtask_title="${ui_state[subtask_${subtask_index}_title]}"
-                local subtask_status="${ui_state[subtask_${subtask_index}_status]}"
-                local is_last_subtask=$(( subtask_index == total_subtasks - 1 ))
-                local tree_prefix="├── "
-                [[ $is_last_subtask -eq 1 ]] && tree_prefix="└── "
+        while [[ -n "${ui_state[subtask_${subtask_index}_title]}" ]]; do
+            local subtask_title="${ui_state[subtask_${subtask_index}_title]}"
+            local subtask_status="${ui_state[subtask_${subtask_index}_status]}"
+            local is_last_subtask=$(( subtask_index == total_subtasks - 1 ))
+            local tree_prefix="├── "
+            [[ $is_last_subtask -eq 1 ]] && tree_prefix="└── "
 
-                printf '%s' "$tree_prefix"
-                if [[ "$subtask_status" == "ongoing" ]]; then
-                    printf '\033[1;36m%s\e[0m' "$(_zert_ui_pick_spinner $i)"
-                elif [[ "$subtask_status" == "ok" ]]; then
-                    printf '\033[1;32m✔\033[0m'
-                elif [[ "$subtask_status" == "fail" ]]; then
-                    printf '\033[1;31m✗\033[0m'
-                else
-                    printf '\033[1;90m?\033[0m'
-                fi
-                printf ' %s\033[K\n' "$(_zert_ui_emphasize "$subtask_title")"
-                (( lines_count++ ))
-                (( subtask_index++ ))
-            done
-        fi
+            printf '%s' "$tree_prefix"
+            if [[ "$subtask_status" == "ongoing" ]]; then
+                printf '\033[1;36m%s\e[0m' "$(_zert_ui_pick_spinner $i)"
+            elif [[ "$subtask_status" == "ok" ]]; then
+                printf '\033[1;32m✔\033[0m'
+            elif [[ "$subtask_status" == "fail" ]]; then
+                printf '\033[1;31m✗\033[0m'
+            else
+                printf '\033[1;90m?\033[0m'
+            fi
+            printf ' %s\033[K\n' "$(_zert_ui_emphasize "$subtask_title")"
+            (( lines_count++ ))
+            (( subtask_index++ ))
+        done
         # print log ring buffer — oldest at top, newest at bottom
         local ring_len=${#log_ring[@]}
         if (( ring_len > 0 )); then
