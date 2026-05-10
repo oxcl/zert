@@ -28,40 +28,32 @@ Progress key: `[ ]` todo · `[~]` in progress · `[x]` done
 
 - [x] Parse `zert user/repo` shorthand into canonical GitHub URL
 - [x] Parse `zert https://...` full URLs (GitHub + GitLab)
-- [ ] Parse `zert /absolute/path` for local plugins (reject relative paths)
-- [ ] Clone uncloned plugins via `git clone --filter=tree:0 --single-branch`
-- [ ] Store clones in `$ZERT_PLUGINS_DIR/<sanitized-plugin-id>/`
-- [ ] Compile all `.zsh` files post-clone via `zcompile`
-- [ ] Populate `__ZERT_LOADED_PLUGINS` array on each `zert` call
+- [x] Parse `zert /absolute/path` for local plugins (reject relative paths)
+- [x] Clone uncloned plugins via `git clone --filter=tree:0 --single-branch`
+- [x] Store clones in `$ZERT_PLUGINS_DIR/<sanitized-plugin-id>/`
+- [x] Compile all `.zsh` files post-clone via `zcompile`
+- [x] Populate `__ZERT_LOADED_PLUGINS` array on each `zert` call
 
 ### 0.4 Plugin Loading
 
-- [ ] Source plugins sequentially in declaration order
-- [ ] Add to `fpath` when completion files are detected
-- [ ] Stop loading on first source failure, report skipped plugins
-- [ ] Detect `.zsh-theme` files and enforce single-theme rule
+- [x] Source plugins sequentially in declaration order
+- [x] Add to `fpath` when completion files are detected
+- [x] Stop loading on first source failure, report skipped plugins
+- [x] Detect `.zsh-theme` files and enforce single-theme rule
 
 ### 0.5 Lockfile (basic)
 
-- [ ] Define lockfile format with `::` delimiter
-- [ ] Write lockfile atomically after each install
-- [ ] Parse lockfile to read pinned commit SHAs on next startup
-- [ ] Escape `::` in field values as `\::`
+- [x] Define lockfile format with `::` delimiter
+- [x] Write lockfile atomically after each install
+- [x] Parse lockfile to read pinned commit SHAs on next startup
+- [x] Escape `::` in field values as `\::`
 
 ### 0.6 Minimal UI (`ui.zsh`)
 
-- [ ] Define all `__ZERT_CLR_*` color variables
-- [ ] Implement `NO_COLOR` support
-- [ ] Implement `_zert_ui_ok`, `_zert_ui_error`, `_zert_ui_log`, `_zert_ui_header`
-- [ ] Implement `_zert_ui_progress` (static line, no animation yet)
-
-### 0.7 Tests (MVP coverage)
-
-- [ ] Write `tests/runner.zsh` with: `assert_eq`, `assert_true`, `assert_false`, `assert_file_exists`, `assert_output`
-- [ ] `tests/test_lockfile.zsh` — parse and write lockfile
-- [ ] `tests/test_config.zsh` — config priority resolution
-- [ ] `tests/test_load.zsh` — sequential load + failure propagation
-- [ ] Mock `git clone` and `curl` in tests (no network access)
+- [x] Define all `__ZERT_CLR_*` color variables
+- [x] Implement `NO_COLOR` support
+- [x] Implement `_zert_ui_ok`, `_zert_ui_error`, `_zert_ui_log`, `_zert_ui_header`
+- [x] Implement `_zert_ui_progress` (static line, no animation yet)
 
 ---
 
