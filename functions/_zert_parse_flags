@@ -2,32 +2,14 @@ _zert_parse_flags() {
   local key=""
   if [[ $# -gt 0 ]]; then
     local last_arg="${@[-1]}"
-    if [[ -z "$last_arg" ]]; then
-      key=""
-      set -- "${@[1,-2]}"
-    elif [[ "$last_arg" != --* ]]; then
+    if [[ "$last_arg" != --* ]]; then
       key="$last_arg"
       key="${key//_/-}"
       set -- "${@[1,-2]}"
     fi
   fi
 
-  if [[ -z "$key" ]]; then
-    local -a parts
-    while [[ $# -gt 0 ]]; do
-      case "$1" in
-        --branch) shift; parts+=("branch=$1") ;;
-        --pin)    shift; parts+=("pin=$1")    ;;
-        --no-alias)         parts+=("no-alias=true")         ;;
-        --no-completion)    parts+=("no-completion=true")    ;;
-        --only-completion)  parts+=("only-completion=true")  ;;
-      esac
-      shift
-    done
-    local IFS=","
-    print -n "${parts[*]}"
-    return
-  fi
+  [[ -n "$key" ]] || return 0
 
   while [[ $# -gt 0 ]]; do
     if [[ "$1" == "--$key" ]]; then

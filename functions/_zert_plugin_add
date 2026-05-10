@@ -32,7 +32,7 @@ _zert_plugin_add() {
 
   if ! $plugin_exists; then
     _zert_ui_subtask_start $subtask_idx "Cloning repository"
-    _zert_plugin_clone "$plugin_id" "$source_type" "$source_value" "$@" | _zert_ui_subtask_log 4
+    _zert_plugin_clone "$plugin_id" "$source_type" "$source_value" "$@" 2>&1 | _zert_ui_subtask_log 4
     if [[ ${pipestatus[1]} -ne 0 ]]; then
       _zert_ui_subtask_update $subtask_idx "Clone failed!"
       _zert_ui_subtask_end $subtask_idx "fail"
@@ -45,22 +45,25 @@ _zert_plugin_add() {
   fi
 
   sync_action="$(_zert_plugin_ensure_sync "$plugin_id" "$source_type" "$source_value" "$@")"
-  echo sync_action="$sync_action" >> "./tmp.log"
+  echo sync_action="$sync_action $plugin_id" > "/tmp/sync_action_debug.txt"
   if [[ "$sync_action" != "synced" ]]; then
     _zert_ui_subtask_start $subtask_idx "Cleaning compiled files"
-    find "$plugin_dir" -name "*.zwc" -type f -delete  2>&1 | _zert_ui_subtask_log 4
+    find "$plugin_dir" -name "*.zwc" -type f -delete  2>&1 | _zert_ui_subtask_log 
     if [[ ${pipestatus[1]} -ne 0 ]]; then
       _zert_ui_subtask_update $subtask_idx "Cleaning compiled files failed!"
       _zert_ui_subtask_end $subtask_idx "fail"
       _zert_ui_task_end "fail" "failed to clean compiled files."
       return 1
     fi
+    _zert_ui_subtask_update $subtask_idx "Cleaned compiled files"
+    _zert_ui_subtask_end $subtask_idx "ok"
+    (( subtask_idx++ ))
 
 
     case "$sync_action" in
       register)
         _zert_ui_subtask_start $subtask_idx "Registering plugin in lockfile"
-        _zert_plugin_register "$plugin_id" "$source_type" "$source_value" "$@" | _zert_ui_subtask_log 4
+        _zert_plugin_register "$plugin_id" "$source_type" "$source_value" "$@" 2>&1 | _zert_ui_subtask_log 4
         if [[ ${pipestatus[1]} -ne 0 ]]; then
           _zert_ui_subtask_update $subtask_idx "Registering plugin in lockfile failed!"
           _zert_ui_subtask_end $subtask_idx "fail"
@@ -73,7 +76,7 @@ _zert_plugin_add() {
         ;;
       checkout)
         _zert_ui_subtask_start $subtask_idx "Checking out locked version"
-        _zert_plugin_checkout "$plugin_id" "$source_type" "$source_value" "$@" | _zert_ui_subtask_log 4
+        _zert_plugin_checkout "$plugin_id" "$source_type" "$source_value" "$@" 2>&1 | _zert_ui_subtask_log 4
         if [[ ${pipestatus[1]} -ne 0 ]]; then
           _zert_ui_subtask_update $subtask_idx "Checking out locked version failed!"
           _zert_ui_subtask_end $subtask_idx "fail"
@@ -86,7 +89,7 @@ _zert_plugin_add() {
         ;;
       pull)
         _zert_ui_subtask_start $subtask_idx "Pulling to match locked version"
-        _zert_plugin_pull     "$plugin_id" "$source_type" "$source_value" "$@" | _zert_ui_subtask_log 4
+        _zert_plugin_pull     "$plugin_id" "$source_type" "$source_value" "$@" 2>&1 | _zert_ui_subtask_log 4
         if [[ ${pipestatus[1]} -ne 0 ]]; then
           _zert_ui_subtask_update $subtask_idx "Pulling to match locked version failed!"
           _zert_ui_subtask_end $subtask_idx "fail"
@@ -96,6 +99,19 @@ _zert_plugin_add() {
         _zert_ui_subtask_update $subtask_idx "Pulled to match locked version"
         _zert_ui_subtask_end $subtask_idx "ok"
         (( subtask_idx++ ))
+
+        _zert_ui_subtask_start $subtask_idx "Checking out locked version"
+        _zert_plugin_checkout "$plugin_id" "$source_type" "$source_value" "$@" 2>&1 | _zert_ui_subtask_log 4
+        if [[ ${pipestatus[1]} -ne 0 ]]; then
+          _zert_ui_subtask_update $subtask_idx "Checking out locked version failed!"
+          _zert_ui_subtask_end $subtask_idx "fail"
+          _zert_ui_task_end "fail" "failed to checkout locked version."
+          return 1
+        fi
+        _zert_ui_subtask_update $subtask_idx "Checked out locked version"
+        _zert_ui_subtask_end $subtask_idx "ok"
+        (( subtask_idx++ ))
+
         ;;
     esac
     _zert_ui_subtask_start $subtask_idx "Compiling files"

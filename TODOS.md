@@ -12,22 +12,22 @@ Progress key: `[ ]` todo · `[~]` in progress · `[x]` done
 
 ### 0.1 Bootstrap
 
-- [ ] Write `bootstrap.sh` in POSIX sh — clones `github.com/oxcl/zert` into `$ZERT_DIR/zert/`
-- [ ] Verify bootstrap is idempotent (safe to run twice)
-- [ ] Confirm bootstrap works without Zsh in PATH (uses only POSIX sh builtins + git + curl)
+- [x] Write `bootstrap.sh` in POSIX sh — clones `github.com/oxcl/zert` into `$ZERT_DIR/zert/`
+- [x] Verify bootstrap is idempotent (safe to run twice)
+- [x] Confirm bootstrap works without Zsh in PATH (uses only POSIX sh builtins + git + curl)
 
 ### 0.2 Core Entrypoint (`zert.zsh`)
 
-- [ ] Implement startup dependency checks: `git`, `curl`, `zsh >= 5.0`
-- [ ] Print to stderr and `return 1` if any dependency is missing
-- [ ] Resolve all config paths from env vars with XDG defaults
-- [ ] Source `ui.zsh` from same directory
-- [ ] Implement the `zert` dispatcher function
+- [x] Implement startup dependency checks: `git`, `curl`, `zsh >= 5.0`
+- [x] Print to stderr and `return 1` if any dependency is missing
+- [x] Resolve all config paths from env vars with XDG defaults
+- [x] Source `ui.zsh` from same directory
+- [x] Implement the `zert` dispatcher function
 
 ### 0.3 Plugin Declaration & Cloning
 
-- [ ] Parse `zert user/repo` shorthand into canonical GitHub URL
-- [ ] Parse `zert https://...` full URLs (GitHub + GitLab)
+- [x] Parse `zert user/repo` shorthand into canonical GitHub URL
+- [x] Parse `zert https://...` full URLs (GitHub + GitLab)
 - [ ] Parse `zert /absolute/path` for local plugins (reject relative paths)
 - [ ] Clone uncloned plugins via `git clone --filter=tree:0 --single-branch`
 - [ ] Store clones in `$ZERT_PLUGINS_DIR/<sanitized-plugin-id>/`

@@ -27,7 +27,7 @@ _zert_parse_source() {
   # SSH URL (git@domain:owner/repo)
   if [[ "$input" = (#b)(git@[^:]*):([^/]##/[^/]##) ]]; then
     __ZERT_SOURCE_TYPE="git"
-    __ZERT_SOURCE_VALUE="git://${match[1]#git@}/${match[2]}"
+    __ZERT_SOURCE_VALUE="$input"
     return 0
   fi
 

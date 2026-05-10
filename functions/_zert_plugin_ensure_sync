@@ -27,13 +27,21 @@ _zert_plugin_ensure_sync() {
       esac
     done
 
-    if [[ -n "$branch" && "$lock_branch" != "$branch" ]]; then
-      print -n "checkout"
+    if [[ "$lock_branch" != "$branch" ]]; then
+      if git -C "$plugin_dir" rev-parse --verify "refs/heads/$branch" &>/dev/null; then
+        print -n "checkout"
+      else
+        print -n "pull"
+      fi
       return 0
     fi
 
-    if [[ -n "$pin" && "$lock_pin" != "$pin" ]]; then
-      print -n "checkout"
+    if [[ "$lock_pin" != "$pin" ]]; then
+      if git -C "$plugin_dir" cat-file -e "$pin" &>/dev/null; then
+        print -n "checkout"
+      else
+        print -n "pull"
+      fi
       return 0
     fi
 

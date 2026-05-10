@@ -1,6 +1,19 @@
 _zert_lockfile_write_entry() {
   local plugin_id="$1" source="$2" url="$3" commit_sha="$4"
-  local options="$(_zert_parse_flags "$5" "")"
+  shift 4
+  local -a parts
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      --branch) shift; parts+=("branch=$1") ;;
+      --pin)    shift; parts+=("pin=$1")    ;;
+      --no-alias)         parts+=("no-alias=true")         ;;
+      --no-completion)    parts+=("no-completion=true")    ;;
+      --only-completion)  parts+=("only-completion=true")  ;;
+    esac
+    shift
+  done
+  local IFS=","
+  local options="${parts[*]}"
   local tmpfile="${ZERT_LOCKFILE}.tmp.$$"
   local found=0
 
@@ -30,6 +43,7 @@ _zert_lockfile_write_entry() {
 
   if [[ $found -eq 0 ]]; then
     print "${plugin_id}::${source}::${url}::${commit_sha}::${options}" >> "$tmpfile"
+    print "${plugin_id}::${source}::${url}::${commit_sha}::${options}" > /tmp/test.log
   fi
 
   mv "$tmpfile" "$ZERT_LOCKFILE"

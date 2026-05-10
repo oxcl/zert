@@ -2,6 +2,7 @@ _zert_plugin_ensure_exists() {
   local plugin_id="$1"
   local plugin_dir="$ZERT_PLUGINS_DIR/$plugin_id"
 
-  [[ -d "$plugin_dir/.git" ]] && return 0
+  [[ -d "$plugin_dir/" ]] && return 0
+  [[ -f "$plugin_dir" ]] && return 0
   return 1
 }

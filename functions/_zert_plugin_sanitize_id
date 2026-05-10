@@ -22,6 +22,7 @@ _zert_plugin_sanitize_id() {
 
       # Remove .git suffix if present
       plugin_id="${plugin_id%.git}"
+      plugin_id="${plugin_id//\//--}"
       ;;
 
     local)
