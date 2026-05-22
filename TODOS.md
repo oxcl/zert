@@ -64,10 +64,6 @@ Progress key: `[ ]` todo · `[~]` in progress · `[x]` done
 - [ ] `zert list` — print all plugins with status: installed / missing / pinned
 - [ ] `zert prune` — delete dirs in `$ZERT_PLUGINS_DIR` not in `__ZERT_LOADED_PLUGINS`, remove from lockfile
 - [ ] `zert update` — pull latest commits for all plugins, recompile, regenerate lockfile
-- [ ] `zert lock` — manually regenerate `zert.lock` from current state
-- [ ] `zert self-update` — `git pull --ff-only origin main` in `$ZERT_DIR/zert/`, print restart prompt
-- [ ] `zert config` — print all `ZERT_*` env vars; `zert config <key> <value>` exports to current session
-- [ ] Add tests for each subcommand
 
 ---
 
@@ -75,14 +71,13 @@ Progress key: `[ ]` todo · `[~]` in progress · `[x]` done
 
 **Goal:** Full support for all inline declaration flags.
 
-- [ ] `--no-alias` — skip sourcing alias files in plugin
-- [ ] `--no-completion` — skip adding completion dirs to `fpath`
-- [ ] `--only-completion` — only add to `fpath`, skip sourcing
-- [ ] `--branch <name>` — clone specified branch
-- [ ] `--pin <sha>` — pin to exact commit SHA, override lockfile
-- [ ] Validate `--pin` SHA exists in the repo before accepting
-- [ ] Persist all flags in lockfile `options` field
-- [ ] Add flag parsing tests
+- [x] `--no-alias` — skip sourcing alias files in plugin
+- [x] `--no-completion` — skip adding completion dirs to `fpath`
+- [x] `--only-completion` — only add to `fpath`, skip sourcing
+- [x] `--branch <name>` — clone specified branch
+- [x] `--pin <sha>` — pin to exact commit SHA, override lockfile
+- [x] Validate `--pin` SHA exists in the repo before accepting
+- [x] Persist all flags in lockfile `options` field
 
 ---
 
