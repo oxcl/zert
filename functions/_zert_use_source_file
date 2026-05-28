@@ -10,11 +10,10 @@ _zert_use_source_file() {
     return 1
   fi
 
-  local no_completion only_completion
+  local no_completion
   no_completion="$(_zert_parse_flags "no_completion" "$@")"
-  only_completion="$(_zert_parse_flags "only_completion" "$@")"
 
-  if [[ "$no_completion" != "true" && "$only_completion" != "true" ]]; then
+  if [[ "$no_completion" != "true" ]]; then
     [[ -d "$dir" ]] && fpath=("$dir" $fpath)
   fi
 

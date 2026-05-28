@@ -71,11 +71,13 @@ zert zsh-users/zsh-autosuggestions --pin a1b2c3d4e5f6
 zert $ZDOTDIR/local-plugins/my-work-plugin
 
 # Oh-My-Zsh compatibility — load OMZ libs without the full framework
-zert use ohmyzsh/lib/clipboard
-zert use ohmyzsh/plugins/git
+zert use ohmyzsh
+zert ohmyzsh lib/clipboard
+zert ohmyzsh plugins/git
 
 # Prezto compatibility
-zert use prezto/modules/utility
+zert use prezto
+zert prezto modules/utility
 ```
 
 ### Flags
@@ -113,7 +115,7 @@ After every install or update, Zert writes `zert.lock` to your `$ZDOTDIR` (usual
 version::1
 zsh-users/zsh-autosuggestions::github::https://github.com/zsh-users/zsh-autosuggestions::a1b2c3d4e5f6...::pin=false
 zsh-users/zsh-syntax-highlighting::github::https://github.com/zsh-users/zsh-syntax-highlighting::f7g8h9i0j1k2...::
-ohmyzsh/lib/clipboard::ohmyzsh::https://github.com/ohmyzsh/ohmyzsh::3l4m5n6o7p8q...::branch=master
+ohmyzsh::ohmyzsh::ohmyzsh::3l4m5n6o7p8q...::
 ```
 
 **Commit `zert.lock` to your dotfiles.** On a new machine, Zert reads the lockfile and clones every plugin at the exact same commit — bit-for-bit identical to your other machines.

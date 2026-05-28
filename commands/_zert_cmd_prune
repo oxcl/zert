@@ -1,4 +1,31 @@
-# Stub for zert prune command
 _zert_cmd_prune() {
-  _zert_ui_log "Not yet implemented"
+  if [[ ! -d "$ZERT_PLUGINS_DIR" ]]; then
+    _zert_ui_log "Plugins directory does not exist: $ZERT_PLUGINS_DIR"
+    return 0
+  fi
+
+  local pruned=0
+  local dir_name
+
+  for dir in "$ZERT_PLUGINS_DIR"/*(N/); do
+    dir_name="${dir:t}"
+
+    [[ "$dir_name" = "zert" ]] && continue
+
+    if [[ "${__ZERT_LOADED_PLUGINS[(i)$dir_name]}" -gt ${#__ZERT_LOADED_PLUGINS} ]]; then
+      _zert_ui_log "Pruning **${dir_name}**..."
+      rm -rf "$dir" || {
+        _zert_ui_error "Failed to remove: $dir"
+        continue
+      }
+      _zert_lockfile_remove_entry "$dir_name" 2>/dev/null
+      pruned=$(( pruned + 1 ))
+    fi
+  done
+
+  if [[ $pruned -eq 0 ]]; then
+    _zert_ui_log "Nothing to prune"
+  else
+    _zert_ui_ok "Pruned **${pruned}** plugin(s)"
+  fi
 }

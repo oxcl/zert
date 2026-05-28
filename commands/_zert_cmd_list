@@ -1,4 +1,42 @@
-# Stub for zert list command
 _zert_cmd_list() {
-  _zert_ui_log "Not yet implemented"
+  if [[ ${#__ZERT_LOADED_PLUGINS} -eq 0 ]]; then
+    _zert_ui_log "No plugins loaded"
+    return 0
+  fi
+
+  printf "${__ZERT_CLR_BOLD}%-45s %-8s %-9s %s${__ZERT_CLR_RESET}\n" "PLUGIN" "TYPE" "SHA" "FLAGS"
+
+  local plugin_id
+  for plugin_id in "${__ZERT_LOADED_PLUGINS[@]}"; do
+    local source_type="—" sha="—" flags="—"
+    local display_name="$plugin_id"
+
+    if [[ "$plugin_id" == local* ]]; then
+      source_type="local"
+      display_name="/${plugin_id#local--}"
+      display_name="${display_name//--//}"
+    else
+      local lock_entry
+      lock_entry="$(_zert_lockfile_read_entry "$plugin_id")"
+
+      if [[ -n "$lock_entry" ]]; then
+        local -a parts
+        parts=("${(@s/::/)lock_entry}")
+        source_type="${parts[2]:-—}"
+        sha="${parts[4]:-—}"
+        local options="${parts[5]:-}"
+
+        if [[ -n "$sha" && "$sha" != "—" ]]; then
+          sha="${sha[1,7]}"
+        fi
+
+        if [[ -n "$options" ]]; then
+          flags="$options"
+        fi
+      fi
+    fi
+
+    printf "%-45s ${__ZERT_CLR_BLUE}%-8s${__ZERT_CLR_RESET} ${__ZERT_CLR_GREEN}%-9s${__ZERT_CLR_RESET} ${__ZERT_CLR_CYAN}%s${__ZERT_CLR_RESET}\n" \
+      "$display_name" "$source_type" "$sha" "$flags"
+  done
 }

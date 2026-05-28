@@ -1,0 +1,31 @@
+_zert_lockfile_remove_entry() {
+  local plugin_id="$1"
+
+  [[ ! -f "$ZERT_LOCKFILE" ]] && return 1
+
+  local tmpfile="${ZERT_LOCKFILE}.tmp.$$"
+  local found=0
+
+  print "# AUTO-GENERATED FILE. DO NOT EDIT MANUALLY." > "$tmpfile"
+  print "# Commit this file to version control for reproducible installs." >> "$tmpfile"
+  print "version::1" >> "$tmpfile"
+
+  local line
+  while IFS= read -r line; do
+    [[ "$line" = \#* || -z "$line" ]] && continue
+    [[ "$line" = version::* ]] && continue
+
+    local -a parts
+    parts=("${(@s/::/)line}")
+
+    if [[ "${parts[1]}" = "$plugin_id" ]]; then
+      found=1
+      continue
+    fi
+
+    print "$line" >> "$tmpfile"
+  done < "$ZERT_LOCKFILE"
+
+  mv "$tmpfile" "$ZERT_LOCKFILE"
+  return $(( 1 - found ))
+}

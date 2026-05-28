@@ -61,9 +61,9 @@ Progress key: `[ ]` todo · `[~]` in progress · `[x]` done
 
 **Goal:** Users can manage their plugin set from the terminal. Adds the six core subcommands.
 
-- [ ] `zert list` — print all plugins with status: installed / missing / pinned
-- [ ] `zert prune` — delete dirs in `$ZERT_PLUGINS_DIR` not in `__ZERT_LOADED_PLUGINS`, remove from lockfile
-- [ ] `zert update` — pull latest commits for all plugins, recompile, regenerate lockfile
+- [x] `zert list` — print all plugins with status: installed / missing / pinned
+- [x] `zert prune` — delete dirs in `$ZERT_PLUGINS_DIR` not in `__ZERT_LOADED_PLUGINS`, remove from lockfile
+- [x] `zert update` — pull latest commits for all plugins, recompile, regenerate lockfile
 
 ---
 

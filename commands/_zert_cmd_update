@@ -1,4 +1,81 @@
-# Stub for zert update command
 _zert_cmd_update() {
-  _zert_ui_log "Not yet implemented"
+  if [[ ! -f "$ZERT_LOCKFILE" ]]; then
+    _zert_ui_error "No lockfile found: $ZERT_LOCKFILE"
+    return 1
+  fi
+
+  local updated=0 skipped=0 failed=0
+  local line
+
+  while IFS= read -r line; do
+    [[ "$line" = \#* || -z "$line" ]] && continue
+    [[ "$line" = version::* ]] && continue
+
+    local -a parts
+    parts=("${(@s/::/)line}")
+
+    local plugin_id="${parts[1]}"
+    local source_type="${parts[2]}"
+    local source_value="${parts[3]}"
+    local commit_sha="${parts[4]}"
+    local options="${parts[5]}"
+
+    if [[ "$source_type" = "local" ]]; then
+      continue
+    fi
+
+    local is_pinned=0
+    if [[ -n "$options" ]]; then
+      local -a opt_pairs
+      opt_pairs=("${(@s/,/)options}")
+      local opt
+      for opt in "${opt_pairs[@]}"; do
+        if [[ "$opt" = pin=* ]]; then
+          is_pinned=1
+          break
+        fi
+      done
+    fi
+
+    if [[ $is_pinned -eq 1 ]]; then
+      _zert_ui_log "Skipping **${plugin_id}** (pinned)"
+      skipped=$(( skipped + 1 ))
+      continue
+    fi
+
+    local plugin_dir="$ZERT_PLUGINS_DIR/$plugin_id"
+    if [[ ! -d "$plugin_dir" ]]; then
+      _zert_ui_log "Skipping **${plugin_id}** (not installed)"
+      skipped=$(( skipped + 1 ))
+      continue
+    fi
+
+    _zert_ui_log "Updating **${plugin_id}**..."
+
+    local -a update_flags
+    if [[ -n "$options" ]]; then
+      local -a opt_pairs
+      opt_pairs=("${(@s/,/)options}")
+      local opt
+      for opt in "${opt_pairs[@]}"; do
+        local key="${opt%%=*}" value="${opt#*=}"
+        case "$key" in
+          branch) update_flags+=("--branch" "$value") ;;
+          no-alias) update_flags+=("--no-alias") ;;
+          no-completion) update_flags+=("--no-completion") ;;
+          only-completion) update_flags+=("--only-completion") ;;
+        esac
+      done
+    fi
+
+    if _zert_plugin_update "$plugin_id" "$source_type" "$source_value" "${update_flags[@]}"; then
+      _zert_plugin_compile "$plugin_dir"
+      updated=$(( updated + 1 ))
+    else
+      _zert_ui_error "Failed to update: $plugin_id"
+      failed=$(( failed + 1 ))
+    fi
+  done < "$ZERT_LOCKFILE"
+
+  _zert_ui_ok "Updated **${updated}**, skipped **${skipped}**, failed **${failed}**"
 }
