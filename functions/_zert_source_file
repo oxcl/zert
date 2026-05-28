@@ -1,0 +1,22 @@
+_zert_source_file() {
+  local filepath="$1"
+  shift
+
+  local no_alias only_completion
+  no_alias="$(_zert_parse_flags "no_alias" "$@")"
+  only_completion="$(_zert_parse_flags "only_completion" "$@")"
+
+  [[ "$only_completion" == "true" ]] && return 0
+
+  if [[ "$no_alias" == "true" ]]; then
+    function alias() { :; }
+  fi
+  source "$filepath" || {
+    [[ "$no_alias" == "true" ]] && unfunction alias
+    _zert_ui_error "Failed to source: $filepath"
+    return 1
+  }
+  [[ "$no_alias" == "true" ]] && unfunction alias
+
+  return 0
+}

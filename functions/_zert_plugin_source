@@ -1,20 +1,16 @@
 _zert_plugin_source() {
   local plugin_dir="$1"
-  shift
+  local source_type="$2"
+  shift 2
 
-  local no_alias no_completion only_completion
-  no_alias="$(_zert_parse_flags "$@" "no-alias")"
-  no_completion="$(_zert_parse_flags "$@" "no-completion")"
-  only_completion="$(_zert_parse_flags "$@" "only-completion")"
+  [[ "$source_type" == "ohmyzsh" || "$source_type" == "prezto" ]] && return 0
 
-  [[ "$only_completion" = "true" ]] && return 0
+  local no_completion
+  no_completion="$(_zert_parse_flags "no_completion" "$@")"
 
   if [[ -f "$plugin_dir" && "$plugin_dir" == *.zsh ]]; then
-    source "$plugin_dir" || {
-      _zert_ui_error "Failed to source: $plugin_dir"
-      return 1
-    }
-    return 0
+    _zert_source_file "$plugin_dir" "$@"
+    return $?
   fi
 
   if [[ "$no_completion" != "true" ]]; then
@@ -27,11 +23,8 @@ _zert_plugin_source() {
   local -a theme_files
   theme_files=("$plugin_dir"/*.zsh-theme(N))
   if [[ ${#theme_files} -gt 0 ]]; then
-    source "${theme_files[1]}" || {
-      _zert_ui_error "Failed to source theme: ${theme_files[1]}"
-      return 1
-    }
-    return 0
+    _zert_source_file "${theme_files[1]}" "$@"
+    return $?
   fi
 
   local main_file=""
@@ -62,16 +55,5 @@ _zert_plugin_source() {
     return 1
   fi
 
-  if [[ "$no_alias" == "true" ]]; then
-    function alias() { :; }
-  fi
-  source "$main_file" || {
-    _zert_ui_error "Failed to source: $main_file"
-    return 1
-  }
-  if [[ "$no_alias" == "true" ]]; then
-    unfunction alias
-  fi
-
-  return 0
+  _zert_source_file "$main_file" "$@"
 }

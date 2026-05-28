@@ -10,8 +10,8 @@ _zert_plugin_ensure_sync() {
   local plugin_dir="$ZERT_PLUGINS_DIR/$plugin_id"
 
   local branch pin
-  branch="$(_zert_parse_flags "$@" "branch")"
-  pin="$(_zert_parse_flags "$@" "pin")"
+  branch="$(_zert_parse_flags "branch" "$@")"
+  pin="$(_zert_parse_flags "pin" "$@")"
 
   local lock_entry
   lock_entry="$(_zert_lockfile_read_entry "$plugin_id")"

@@ -1,0 +1,23 @@
+_zert_use_source_file() {
+  local dir="$1" filename="$2" load_id="$3"
+  shift 3
+
+  [[ "${__ZERT_LOADED_PLUGINS[(i)$load_id]}" -le ${#__ZERT_LOADED_PLUGINS} ]] && return 0
+
+  local filepath="$dir/$filename"
+  if [[ ! -f "$filepath" ]]; then
+    _zert_ui_error "File not found: $filepath"
+    return 1
+  fi
+
+  local no_completion only_completion
+  no_completion="$(_zert_parse_flags "no_completion" "$@")"
+  only_completion="$(_zert_parse_flags "only_completion" "$@")"
+
+  if [[ "$no_completion" != "true" && "$only_completion" != "true" ]]; then
+    [[ -d "$dir" ]] && fpath=("$dir" $fpath)
+  fi
+
+  _zert_source_file "$filepath" "$@" || return 1
+  __ZERT_LOADED_PLUGINS+=("$load_id")
+}

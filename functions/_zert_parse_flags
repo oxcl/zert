@@ -1,15 +1,9 @@
 _zert_parse_flags() {
-  local key=""
-  if [[ $# -gt 0 ]]; then
-    local last_arg="${@[-1]}"
-    if [[ "$last_arg" != --* ]]; then
-      key="$last_arg"
-      key="${key//_/-}"
-      set -- "${@[1,-2]}"
-    fi
-  fi
+  local key="$1"
+  shift
 
   [[ -n "$key" ]] || return 0
+  key="${key//_/-}"
 
   while [[ $# -gt 0 ]]; do
     if [[ "$1" == "--$key" ]]; then

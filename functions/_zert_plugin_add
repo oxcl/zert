@@ -26,7 +26,7 @@ _zert_plugin_add() {
   $plugin_exists && sync_action="$(_zert_plugin_ensure_sync "$plugin_id" "$source_type" "$source_value" "$@")"
 
   if $plugin_exists && [[ "$sync_action" == "synced" ]]; then
-    _zert_plugin_source "$plugin_dir" "$@" || return 1
+    _zert_plugin_source "$plugin_dir" "$source_type" "$@" || return 1
     __ZERT_LOADED_PLUGINS+=("$plugin_id")
     return 0
   fi
@@ -49,7 +49,6 @@ _zert_plugin_add() {
   fi
 
   sync_action="$(_zert_plugin_ensure_sync "$plugin_id" "$source_type" "$source_value" "$@")"
-  echo sync_action="$sync_action $plugin_id" > "/tmp/sync_action_debug.txt"
   if [[ "$sync_action" != "synced" ]]; then
     _zert_ui_subtask_start $subtask_idx "Cleaning compiled files"
     find "$plugin_dir" -name "*.zwc" -type f -delete  2>&1 | _zert_ui_subtask_log 
@@ -132,7 +131,7 @@ _zert_plugin_add() {
   fi
 
   _zert_ui_subtask_start $subtask_idx "Sourcing plugin"
-  _zert_plugin_source "$plugin_dir" "$@" || {
+  _zert_plugin_source "$plugin_dir" "$source_type" "$@" || {
     _zert_ui_subtask_update $subtask_idx "Sourcing plugin failed!"
     _zert_ui_subtask_end $subtask_idx "fail"
     _zert_ui_task_end "fail" "failed to source plugin after configuration."

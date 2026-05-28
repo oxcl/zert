@@ -1,0 +1,29 @@
+_zert_cmd_prezto() {
+  if [[ -z "$__ZERT_USE_PREZTO" ]]; then
+    _zert_ui_error "prezto not initialized. Run 'zert use prezto' first."
+    return 1
+  fi
+
+  local module="$1"
+  shift
+
+  if [[ -z "$module" ]]; then
+    _zert_ui_error "Usage: zert prezto <module> [flags]"
+    return 1
+  fi
+
+  local module_dir="$ZPREZTODIR/modules/$module"
+  if [[ ! -d "$module_dir" ]]; then
+    _zert_ui_error "Module not found: $module"
+    return 1
+  fi
+
+  if [[ -d "$module_dir/functions" ]]; then
+    fpath=("$module_dir/functions" $fpath)
+    local -a funcs
+    funcs=("$module_dir/functions"/^([_.]*|prompt_*_setup|README*)(-.N:t))
+    (( ${#funcs} )) && autoload -Uz "${funcs[@]}"
+  fi
+
+  _zert_use_source_file "$module_dir" "init.zsh" "prezto:modules/$module" "$@"
+}

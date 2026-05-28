@@ -7,12 +7,18 @@ _zert_plugin_clone() {
 
   local clone_args=("--filter=tree:0" --progress --verbose)
   local branch pin
-  branch="$(_zert_parse_flags "$@" "branch")"
-  pin="$(_zert_parse_flags "$@" "pin")"
+  branch="$(_zert_parse_flags "branch" "$@")"
+  pin="$(_zert_parse_flags "pin" "$@")"
 
   [[ -n "$branch" ]] && clone_args=($clone_args "--branch" "$branch")
 
-  git clone ${clone_args[@]} "$source_value" "$plugin_dir" 2>&1 || return 1
+  local clone_url="$source_value"
+  case "$source_type" in
+    ohmyzsh) clone_url="https://github.com/ohmyzsh/ohmyzsh" ;;
+    prezto)  clone_url="https://github.com/sorin-ionescu/prezto" ;;
+  esac
+
+  git clone ${clone_args[@]} "$clone_url" "$plugin_dir" 2>&1 || return 1
 
   return 0
 }

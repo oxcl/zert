@@ -43,7 +43,6 @@ _zert_lockfile_write_entry() {
 
   if [[ $found -eq 0 ]]; then
     print "${plugin_id}::${source}::${url}::${commit_sha}::${options}" >> "$tmpfile"
-    print "${plugin_id}::${source}::${url}::${commit_sha}::${options}" > /tmp/test.log
   fi
 
   mv "$tmpfile" "$ZERT_LOCKFILE"

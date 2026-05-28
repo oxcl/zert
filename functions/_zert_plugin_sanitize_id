@@ -30,11 +30,19 @@ _zert_plugin_sanitize_id() {
       ;;
 
     ohmyzsh)
-      plugin_id="ohmyzsh/${source_value#ohmyzsh/}"
+      if [[ "$source_value" == "ohmyzsh" ]]; then
+        plugin_id="ohmyzsh"
+      else
+        plugin_id="ohmyzsh/${source_value#ohmyzsh/}"
+      fi
       ;;
 
     prezto)
-      plugin_id="prezto/${source_value#prezto/}"
+      if [[ "$source_value" == "prezto" ]]; then
+        plugin_id="prezto"
+      else
+        plugin_id="prezto/${source_value#prezto/}"
+      fi
       ;;
 
     *)

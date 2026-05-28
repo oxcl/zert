@@ -1,0 +1,39 @@
+_zert_cmd_ohmyzsh() {
+  if [[ -z "$__ZERT_USE_OMZ" ]]; then
+    _zert_ui_error "ohmyzsh not initialized. Run 'zert use ohmyzsh' first."
+    return 1
+  fi
+
+  local component="$1"
+  shift
+
+  if [[ -z "$component" ]]; then
+    _zert_ui_error "Usage: zert ohmyzsh <plugins|lib|themes>/<name> [flags]"
+    return 1
+  fi
+
+  local component_type="${component%%/*}"
+  local component_name="${component#*/}"
+
+  case "$component_type" in
+    plugins)
+      local plugin_dir="$ZSH/plugins/$component_name"
+      if [[ ! -d "$plugin_dir" ]]; then
+        _zert_ui_error "Plugin not found: $component_name"
+        return 1
+      fi
+      fpath=("$plugin_dir" $fpath)
+      _zert_use_source_file "$plugin_dir" "$component_name.plugin.zsh" "ohmyzsh:$component" "$@"
+      ;;
+    lib)
+      _zert_use_source_file "$ZSH/lib" "$component_name.zsh" "ohmyzsh:$component" "$@"
+      ;;
+    themes)
+      _zert_use_source_file "$ZSH/themes" "$component_name.zsh-theme" "ohmyzsh:$component" "$@"
+      ;;
+    *)
+      _zert_ui_error "Unknown type: $component_type (use: plugins, lib, themes)"
+      return 1
+      ;;
+  esac
+}

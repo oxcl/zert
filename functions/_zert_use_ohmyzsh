@@ -1,0 +1,14 @@
+_zert_use_ohmyzsh() {
+  [[ -n "$__ZERT_USE_OMZ" ]] && return 0
+
+  _zert_plugin_add "ohmyzsh" "ohmyzsh" "$@" || return 1
+
+  export ZSH="$ZERT_PLUGINS_DIR/ohmyzsh"
+  export ZSH_CUSTOM="$ZSH/custom"
+  export ZSH_CACHE_DIR="${XDG_CACHE_HOME:-$HOME/.cache}/oh-my-zsh"
+  mkdir -p "$ZSH_CACHE_DIR/completions" 2>/dev/null
+
+  fpath=("$ZSH/functions" "$ZSH/completions" "$ZSH_CACHE_DIR/completions" $fpath)
+
+  __ZERT_USE_OMZ=1
+}

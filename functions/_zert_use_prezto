@@ -1,0 +1,18 @@
+_zert_use_prezto() {
+  [[ -n "$__ZERT_USE_PREZTO" ]] && return 0
+
+  _zert_plugin_add "prezto" "prezto" "$@" || return 1
+
+  export ZPREZTODIR="$ZERT_PLUGINS_DIR/prezto"
+
+  if [[ -f "$ZPREZTODIR/modules/helper/init.zsh" ]]; then
+    source "$ZPREZTODIR/modules/helper/init.zsh"
+  fi
+
+  local mod_func_dir
+  for mod_func_dir in "$ZPREZTODIR"/modules/*/functions(N/); do
+    fpath=("$mod_func_dir" $fpath)
+  done
+
+  __ZERT_USE_PREZTO=1
+}

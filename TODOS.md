@@ -85,11 +85,14 @@ Progress key: `[ ]` todo · `[~]` in progress · `[x]` done
 
 **Goal:** Users can load OMZ/Prezto modules without installing those frameworks in full.
 
-- [ ] Implement `zert use ohmyzsh/<path>` — clone OMZ once to `$ZERT_PLUGINS_DIR/ohmyzsh`, source subdirectory
-- [ ] Implement `zert use prezto/<path>` — clone Prezto once to `$ZERT_PLUGINS_DIR/prezto`, source module
-- [ ] Shared parent repo cloned only once, even with multiple `use` declarations
-- [ ] Track `use` plugins in `__ZERT_LOADED_PLUGINS` for prune compatibility
-- [ ] Add lockfile entries for `ohmyzsh` and `prezto` source types
+- [x] Implement `zert use ohmyzsh` — clone OMZ once to `$ZERT_PLUGINS_DIR/ohmyzsh`, set up `$ZSH`/fpath
+- [x] Implement `zert use prezto` — clone Prezto once to `$ZERT_PLUGINS_DIR/prezto`, set up `$ZPREZTODIR`/fpath
+- [x] Implement `zert ohmyzsh <plugins|lib|themes>/<name>` — load individual OMZ components with flag support
+- [x] Implement `zert prezto <module>` — load individual Prezto modules with flag support
+- [x] Shared parent repo cloned only once via `_zert_plugin_add` dedup
+- [x] Track loaded components in `__ZERT_LOADED_PLUGINS` (e.g., `ohmyzsh:plugins/git`)
+- [x] Add lockfile entries for `ohmyzsh` and `prezto` source types (framework only, not per-component)
+- [x] Shared `_zert_use_source_file` helper for dedup, flags, no-alias, fpath, source
 
 ---
 
@@ -112,8 +115,8 @@ Progress key: `[ ]` todo · `[~]` in progress · `[x]` done
 
 **Goal:** Support all git URL formats, including private repos via SSH.
 
-- [ ] Parse `git@github.com:user/repo.git` SSH URLs
-- [ ] Parse `git@gitlab.com:user/repo.git` SSH URLs
+- [x] Parse `git@github.com:user/repo.git` SSH URLs
+- [x] Parse `git@gitlab.com:user/repo.git` SSH URLs
 - [ ] Detect and record source type (`github`/`gitlab`) from URL
 - [ ] Handle clone failures for private repos with a clear error (SSH key not configured)
 - [ ] Document SSH setup in README
