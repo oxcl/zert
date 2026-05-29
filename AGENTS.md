@@ -181,7 +181,7 @@ Resolution logic must always follow this order. Never read a lower-priority sour
 - ❌ Add a `doctor`/`diagnose` subcommand — dependency checks happen silently on load
 - ❌ Use `source` with a path that isn't validated to exist first
 - ❌ Call `exit` from any sourced file
-- ❌ Spawn background jobs in the plugin load path
+- ❌ Spawn background jobs during the plugin load/sourcing phase. Parallel clone/compile during install or update is allowed.
 - ❌ Silently swallow errors — every failure must surface to the user
 - ❌ committing changes without explicit developer permission (suggesting to commit changes is accepted)
 

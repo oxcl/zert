@@ -2,6 +2,16 @@ _zert_plugin_add() {
   local source_type="$1" source_value="$2"
   shift 2
 
+  if [[ -z "$__ZERT_FAST_TRACK_ATTEMPTED" ]]; then
+    __ZERT_FAST_TRACK_ATTEMPTED=1
+    if _zert_should_fast_track; then
+      _zert_fast_track
+      if [[ "$__ZERT_INTERRUPTED" -eq 1 ]]; then
+        return 1
+      fi
+    fi
+  fi
+
   local plugin_id
   plugin_id="$(_zert_plugin_sanitize_id "$source_type" "$source_value")"
   if [[ -z "$plugin_id" ]]; then
@@ -142,6 +152,10 @@ _zert_plugin_add() {
 
   _zert_ui_task_update "Configured plugin **${plugin_id}**"
   _zert_ui_task_end "ok"
+
+  if [[ "$__ZERT_INTERRUPTED" -eq 1 ]]; then
+    return 1
+  fi
 
   __ZERT_LOADED_PLUGINS+=("$plugin_id")
   return 0

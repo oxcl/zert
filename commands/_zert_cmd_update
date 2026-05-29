@@ -91,6 +91,9 @@ _zert_cmd_update() {
     _zert_ui_subtask_end $subtask_idx "ok"
 
     _zert_ui_task_end "ok"
+    if [[ "$__ZERT_INTERRUPTED" -eq 1 ]]; then
+      return 1
+    fi
     updated=$(( updated + 1 ))
   done < "$ZERT_LOCKFILE"
 }

@@ -12,7 +12,7 @@ Progress key: `[ ]` todo · `[~]` in progress · `[x]` done
 
 ### 0.1 Bootstrap
 
-- [x] Write `bootstrap.sh` in POSIX sh — clones `github.com/oxcl/zert` into `$ZERT_DIR/zert/`
+- [x] Write `bootstrap.sh` in POSIX sh — clones `github.com/oxcl/zert` into `$ZERT_PLUGINS_DIR/zert/`
 - [x] Verify bootstrap is idempotent (safe to run twice)
 - [x] Confirm bootstrap works without Zsh in PATH (uses only POSIX sh builtins + git + curl)
 
@@ -100,40 +100,11 @@ Progress key: `[ ]` todo · `[~]` in progress · `[x]` done
 
 **Goal:** Fast installs with real-time visual feedback. Replaces static progress with live animation.
 
-- [ ] Implement parallel `git clone` with background jobs + PID tracking
-- [ ] `wait` on all PIDs and collect exit codes
-- [ ] Implement `_zert_ui_spinner_start` / `_zert_ui_spinner_stop` with animated ANSI spinner
-- [ ] Implement `_zert_ui_bar <pct>` — inline progress bar
-- [ ] Implement `_zert_ui_header` with version + plugin count + aggregate progress
-- [ ] Display per-plugin lines updating in real-time during parallel clone
-- [ ] Keep all output within 80 columns
-- [ ] Parallel `zcompile` after clone phase
+- [x] Implement parallel `git clone` with background jobs + PID tracking
+- [x] `wait` on all PIDs and collect exit codes
+- [x] Display per-plugin lines updating in real-time during parallel clone
+- [x] Parallel `zcompile` after clone phase
 
----
-
-## Phase 5 — SSH & Full URL Support
-
-**Goal:** Support all git URL formats, including private repos via SSH.
-
-- [x] Parse `git@github.com:user/repo.git` SSH URLs
-- [x] Parse `git@gitlab.com:user/repo.git` SSH URLs
-- [ ] Detect and record source type (`github`/`gitlab`) from URL
-- [ ] Handle clone failures for private repos with a clear error (SSH key not configured)
-- [ ] Document SSH setup in README
-
----
-
-## Phase 6 — Hardening & Edge Cases
-
-**Goal:** Make Zert reliable under real-world conditions.
-
-- [ ] Lockfile migration path — handle `version::1` header, reject unknown versions gracefully
-- [ ] Handle plugin directory that exists but is not a git repo (stale/corrupted clone)
-- [ ] `zert update` on a pinned plugin: skip update, print notice
-- [ ] `zert prune --dry-run` — print what would be removed without deleting
-- [ ] Handle `$ZERT_PLUGINS_DIR` not existing on first run (auto-create)
-- [ ] `zert list --json` — machine-readable output for scripting
-- [ ] Add integration tests using a real temp directory (still no network — use `git init` local repos as fixtures)
 
 ---
 

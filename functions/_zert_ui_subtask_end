@@ -1,4 +1,5 @@
 _zert_ui_subtask_end() {
+  [[ "$__ZERT_TASK_ENDED" == "1" ]] && return 0
   local subtask_index="$1"
   local subtask_status="$2"
 

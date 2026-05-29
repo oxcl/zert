@@ -3,13 +3,16 @@ _zert_ui_task_start(){
     mkfifo "$comm_file" || { _zert_ui_error "Failed to create FIFO"; return 1 }
     
     __ZERT_COMM_FILE="$comm_file"
+    __ZERT_TASK_ENDED=0
+    __ZERT_INTERRUPTED=0
+    __ZERT_BG_PIDS=()
     trap 'rm -f "$__ZERT_COMM_FILE" 2>/dev/null' EXIT
 
     # Start the renderer
     setopt LOCAL_OPTIONS NO_NOTIFY NO_MONITOR
     _zert_ui_background_renderer "$$" "$comm_file" &
     __ZERT_BG_PID="$!"
-
+    __ZERT_BG_PIDS+=("$__ZERT_BG_PID")
 
     # Open the FIFO for writing in the main shell (non-blocking writes)
     exec 4<>"$comm_file"   # FD 4 for writing from main process
@@ -20,7 +23,11 @@ _zert_ui_task_start(){
     echo "task_name=$1" >&4
 
     TRAPINT(){
+        for pid in "${__ZERT_BG_PIDS[@]}"; do
+            kill "$pid" 2>/dev/null
+        done
         _zert_ui_task_end "fail" "Task was interrupted by user"
+        __ZERT_INTERRUPTED=1
         unfunction TRAPINT
         return 0
     }

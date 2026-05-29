@@ -1,0 +1,113 @@
+_zert_fast_track() {
+  local line plugin_id source_type source_value commit_sha options
+  local -a parts entries pids
+  local -A pid_to_plugin
+  local idx=0 total=0 failed=0
+
+  while IFS= read -r line; do
+    [[ "$line" = \#* || -z "$line" ]] && continue
+    [[ "$line" = version::* ]] && continue
+    parts=("${(@s/::/)line}")
+    [[ "${parts[2]}" = "local" ]] && continue
+    entries+=("$line")
+  done < "$ZERT_LOCKFILE"
+
+  (( ${#entries[@]} == 0 )) && return 0
+
+  _zert_ui_task_start "Fast track: installing plugins..."
+  __ZERT_BG_PIDS+=("$__ZERT_BG_PID")
+
+  setopt LOCAL_OPTIONS NO_NOTIFY NO_MONITOR
+
+  for line in "${entries[@]}"; do
+    parts=("${(@s/::/)line}")
+    plugin_id="${parts[1]}"
+    source_type="${parts[2]}"
+    source_value="${parts[3]}"
+    commit_sha="${parts[4]}"
+    options="${parts[5]}"
+
+    case "$source_type" in
+      ohmyzsh) [[ -d "$ZERT_PLUGINS_DIR/ohmyzsh/.git" ]] && continue ;;
+      prezto)  [[ -d "$ZERT_PLUGINS_DIR/prezto/.git" ]] && continue ;;
+      *)       [[ -d "$ZERT_PLUGINS_DIR/$plugin_id" ]] && continue ;;
+    esac
+
+    _zert_ui_subtask_start $idx "Cloning ${plugin_id}..."
+
+    local -a flags
+    if [[ -n "$options" ]]; then
+      local -a opt_pairs
+      local opt key value
+      opt_pairs=("${(@s/,/)options}")
+      for opt in "${opt_pairs[@]}"; do
+        key="${opt%%=*}" value="${opt#*=}"
+        case "$key" in
+          branch) flags+=("--branch" "$value") ;;
+          pin)    flags+=("--pin" "$value") ;;
+          no-alias)        flags+=("--no-alias") ;;
+          no-completion)   flags+=("--no-completion") ;;
+          only-completion) flags+=("--only-completion") ;;
+        esac
+      done
+    fi
+
+    (
+      local plugin_dir="$ZERT_PLUGINS_DIR/$plugin_id"
+      [[ "$source_type" == "ohmyzsh" ]] && plugin_dir="$ZERT_PLUGINS_DIR/ohmyzsh"
+      [[ "$source_type" == "prezto" ]] && plugin_dir="$ZERT_PLUGINS_DIR/prezto"
+
+      if ! _zert_plugin_clone "$plugin_id" "$source_type" "$source_value" "${flags[@]}" >/dev/null 2>&1; then
+        _zert_ui_subtask_update $idx "${plugin_id} clone failed"
+        _zert_ui_subtask_end $idx "fail"
+        return 1
+      fi
+
+      if [[ -n "$commit_sha" ]]; then
+        _zert_ui_subtask_update $idx "Checking out ${plugin_id}..."
+        if ! git -C "$plugin_dir" checkout "$commit_sha" >/dev/null 2>&1; then
+          _zert_ui_subtask_update $idx "${plugin_id} checkout failed"
+          _zert_ui_subtask_end $idx "fail"
+          return 1
+        fi
+      fi
+
+      _zert_ui_subtask_update $idx "Compiling ${plugin_id}..."
+      if ! _zert_plugin_compile "$plugin_dir" >/dev/null 2>&1; then
+        _zert_ui_subtask_update $idx "${plugin_id} compile failed"
+        _zert_ui_subtask_end $idx "fail"
+        return 1
+      fi
+
+      _zert_ui_subtask_update $idx "Installed ${plugin_id}"
+      _zert_ui_subtask_end $idx "ok"
+      return 0
+    ) &
+
+    pids+=($!)
+    pid_to_plugin[$!]="$plugin_id"
+    __ZERT_BG_PIDS+=("$!")
+    (( idx++ ))
+    (( total++ ))
+  done
+
+  if (( total == 0 )); then
+    _zert_ui_task_end "ok"
+    return 0
+  fi
+
+  for pid in "${pids[@]}"; do
+    wait "$pid"
+    if [[ $? -ne 0 ]]; then
+      (( failed++ ))
+    fi
+  done
+
+  if (( failed > 0 )); then
+    _zert_ui_task_end "fail" "$failed of $total plugins failed to install."
+  else
+    _zert_ui_task_end "ok" "All $total plugins installed."
+  fi
+
+  return 0
+}

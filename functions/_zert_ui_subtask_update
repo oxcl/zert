@@ -1,4 +1,5 @@
 _zert_ui_subtask_update(){
+    [[ "$__ZERT_TASK_ENDED" == "1" ]] && return 0
     local subtask_index="$1" subtask_title="$2"
     echo "subtask_${subtask_index}_title=$subtask_title" >&4
 }

@@ -1,0 +1,24 @@
+_zert_should_fast_track() {
+  [[ -f "$ZERT_LOCKFILE" ]] || return 1
+
+  if [[ -d "$ZERT_PLUGINS_DIR" ]]; then
+    local entries=("$ZERT_PLUGINS_DIR"/*(N))
+    if (( ${#entries[@]} == 0 )); then
+      :
+    elif (( ${#entries[@]} == 1 )); then
+      [[ "${entries[1]:t}" != "zert" ]] && return 1
+    else
+      return 1
+    fi
+  fi
+
+  local line
+  while IFS= read -r line; do
+    [[ "$line" = \#* || -z "$line" ]] && continue
+    [[ "$line" = version::* ]] && continue
+    local -a parts=("${(@s/::/)line}")
+    [[ "${parts[2]}" != "local" ]] && return 0
+  done < "$ZERT_LOCKFILE"
+
+  return 1
+}
