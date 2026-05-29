@@ -1,0 +1,19 @@
+_zert_ui_truncate() {
+  local text="$1" max_width="$2"
+  local text_len=${#text}
+
+  if [[ $max_width -le 0 ]]; then
+    print -n ""
+    return
+  fi
+
+  if [[ $text_len -gt $max_width ]]; then
+    if [[ $max_width -le 3 ]]; then
+      print -n "${text[1,$max_width]}"
+    else
+      print -n "${text[1,$((max_width-3))]}..."
+    fi
+  else
+    print -n "$text"
+  fi
+}

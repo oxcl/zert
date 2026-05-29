@@ -4,11 +4,29 @@ _zert_cmd_list() {
     return 0
   fi
 
-  printf "${__ZERT_CLR_BOLD}%-45s %-8s %-9s %s${__ZERT_CLR_RESET}\n" "PLUGIN" "TYPE" "SHA" "FLAGS"
+  # Terminal width detection with fallback
+  local term_width="${COLUMNS:-0}"
+  if [[ $term_width -le 0 ]]; then
+    term_width=120
+  fi
+  [[ $term_width -lt 40 ]] && term_width=40
 
+  # Fixed column widths
+  local type_width=8
+  local sha_width=9
+  # Minimum column widths (header text length)
+  local min_name_width=6
+  local min_flags_width=5
+  # Spaces: 1 after name, 1 after type, 1 after sha
+  local fixed_overhead=$(( type_width + sha_width + 3 ))
+
+  # First pass: collect all data and find max content widths
   local plugin_id source_type sha flags display_name
   local lock_entry options
   local -a parts
+  local -a all_names all_types all_shas all_flags
+  local max_name_len=$min_name_width
+  local max_flags_len=$min_flags_width
 
   for plugin_id in "${__ZERT_LOADED_PLUGINS[@]}"; do
     source_type="—" sha="—" flags="—"
@@ -37,7 +55,48 @@ _zert_cmd_list() {
       fi
     fi
 
-    printf "%-45s ${__ZERT_CLR_BLUE}%-8s${__ZERT_CLR_RESET} ${__ZERT_CLR_GREEN}%-9s${__ZERT_CLR_RESET} ${__ZERT_CLR_CYAN}%s${__ZERT_CLR_RESET}\n" \
-      "$display_name" "$source_type" "$sha" "$flags"
+    all_names+=("$display_name")
+    all_types+=("$source_type")
+    all_shas+=("$sha")
+    all_flags+=("$flags")
+
+    [[ ${#display_name} -gt $max_name_len ]] && max_name_len=${#display_name}
+    [[ ${#flags} -gt $max_flags_len ]] && max_flags_len=${#flags}
+  done
+
+  # Calculate ideal width: content fits perfectly
+  local ideal_width=$(( max_name_len + fixed_overhead + max_flags_len ))
+
+  # Use smaller of ideal vs terminal width
+  local actual_width=$ideal_width
+  local needs_truncation=0
+  [[ $actual_width -gt $term_width ]] && { actual_width=$term_width; needs_truncation=1; }
+
+  local available=$(( actual_width - fixed_overhead ))
+  local flags_width=$max_flags_len
+  local name_width=$max_name_len
+
+  # Only cap flags at 1/3 when content exceeds terminal
+  if [[ $needs_truncation -eq 1 ]]; then
+    local max_flags_allowed=$(( available / 3 ))
+    [[ $max_flags_allowed -lt $min_flags_width ]] && max_flags_allowed=$min_flags_width
+    [[ $flags_width -gt $max_flags_allowed ]] && flags_width=$max_flags_allowed
+    name_width=$(( available - flags_width ))
+  fi
+
+  [[ $name_width -lt $min_name_width ]] && name_width=$min_name_width
+
+  # Print header
+  printf "${__ZERT_CLR_BOLD}%-${name_width}s %-${type_width}s %-${sha_width}s %s${__ZERT_CLR_RESET}\n" \
+    "PLUGIN" "TYPE" "SHA" "FLAGS"
+
+  # Print rows
+  local i
+  for (( i=1; i<=${#all_names[@]}; i++ )); do
+    display_name="$(_zert_ui_truncate "${all_names[$i]}" $name_width)"
+    flags="$(_zert_ui_truncate "${all_flags[$i]}" $flags_width)"
+
+    printf "%-${name_width}s ${__ZERT_CLR_BLUE}%-${type_width}s${__ZERT_CLR_RESET} ${__ZERT_CLR_GREEN}%-${sha_width}s${__ZERT_CLR_RESET} ${__ZERT_CLR_CYAN}%s${__ZERT_CLR_RESET}\n" \
+      "$display_name" "${all_types[$i]}" "${all_shas[$i]}" "$flags"
   done
 }
