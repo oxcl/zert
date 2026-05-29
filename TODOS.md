@@ -59,7 +59,7 @@ Progress key: `[ ]` todo · `[~]` in progress · `[x]` done
 
 ## Phase 1 — Subcommands
 
-**Goal:** Users can manage their plugin set from the terminal. Adds the six core subcommands.
+**Goal:** Users can manage their plugin set from the terminal. Adds the core subcommands.
 
 - [x] `zert list` — print all plugins with status: installed / missing / pinned
 - [x] `zert prune` — delete dirs in `$ZERT_PLUGINS_DIR` not in `__ZERT_LOADED_PLUGINS`, remove from lockfile

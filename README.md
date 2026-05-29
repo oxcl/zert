@@ -1,5 +1,7 @@
 <div align="center">
 
+![Zert logo](./logo.png)
+
 # ⚡ Zert
 
 ### The plugin manager your `.zshrc` has been waiting for.
@@ -98,9 +100,6 @@ zert prezto modules/utility
 zert list          # Show all declared plugins + their status
 zert update        # Pull latest commits for all unpinned plugins
 zert prune         # Delete plugins no longer declared in your config
-zert lock          # Manually regenerate zert.lock
-zert config        # Print all active ZERT_* environment variables
-zert config <key> <value>  # Set a config value for the current session
 ```
 
 ---
@@ -113,8 +112,8 @@ After every install or update, Zert writes `zert.lock` to your `$ZDOTDIR` (usual
 # AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.
 # Commit this file to version control for reproducible installs.
 version::1
-zsh-users/zsh-autosuggestions::github::https://github.com/zsh-users/zsh-autosuggestions::a1b2c3d4e5f6...::pin=false
-zsh-users/zsh-syntax-highlighting::github::https://github.com/zsh-users/zsh-syntax-highlighting::f7g8h9i0j1k2...::
+zsh-users/zsh-autosuggestions::git::https://github.com/zsh-users/zsh-autosuggestions::a1b2c3d4e5f6...::pin=false
+zsh-users/zsh-syntax-highlighting::git::https://github.com/zsh-users/zsh-syntax-highlighting::f7g8h9i0j1k2...::
 ohmyzsh::ohmyzsh::ohmyzsh::3l4m5n6o7p8q...::
 ```
 
@@ -163,13 +162,6 @@ zstyle ':zert:*' filter-tree true
 Zert is built in pure Zsh with no external dependencies. Before contributing, read:
 
 - [`AGENTS.md`](./AGENTS.md) — coding rules and invariants (also useful for AI agents)
-- [`IMPLEMENTATIONS.md`](./IMPLEMENTATIONS.md) — architecture standards
-
-Run tests with:
-
-```zsh
-zsh tests/runner.zsh
-```
 
 ---
 

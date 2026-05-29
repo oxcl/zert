@@ -16,38 +16,17 @@ These rules are **non-negotiable**. Never violate them regardless of context, us
 
 | # | Invariant |
 |---|-----------|
-| I-1 | **Pure Zsh only.** No Python, Ruby, Node, Perl, or any interpreted language beyond Zsh. Allowed external binaries: `git`, `curl`, `grep`, `sed`, `awk`, `stdbuf`. Nothing else. |
+| I-1 | **Pure Zsh only.** No Python, Ruby, Node, Perl, or any interpreted language beyond Zsh. Allowed external binaries: `git`, `curl`, `grep`, `sed`, `awk`, `stdbuf`, `find`. Nothing else. |
 | I-2 | **Never modify user files.** Zert must not edit `.zshrc`, `.zprofile`, or any other user-owned file. Ever. |
-| I-3 | **Config is session-only.** `zert config` writes only to the current shell's environment via `export`. It never touches a persistent config file. |
-| I-4 | **Lockfile is append-safe.** When updating `zert.lock`, always regenerate it atomically (write to a temp file, then `mv`). Never partial-write. |
-| I-6 | **Local `zsh >= 5.0` only.** Do not use features from Zsh 5.1+ without a version guard. |
-| I-7 | **No `eval` unless unavoidable.** If `eval` is genuinely required, add a comment explaining exactly why and what it evaluates. |
+| I-3 | **Lockfile is append-safe.** When updating `zert.lock`, always regenerate it atomically (write to a temp file, then `mv`). Never partial-write. |
+| I-4 | **Local `zsh >= 5.0` only.** Do not use features from Zsh 5.1+ without a version guard. |
+| I-5 | **No `eval` unless unavoidable.** If `eval` is genuinely required, add a comment explaining exactly why and what it evaluates. |
 
 ---
 
-## 2. Repository Structure
+## 2. Zsh Coding Standards
 
-```
-zert/
-├── zert.zsh          # Main entrypoint — sourced by users. Bootstraps everything.
-├── commands/         # user facing functions and subcommands
-├── functions/        # internal functions
-├── bootstrap.sh      # One-time install script fetched via curl. POSIX sh, not Zsh.
-├── AGENTS.md         # This file.
-├── README.md
-├── TODOS.md
-```
-
-**Rules:**
-- `zert.zsh` is the only file users source. It may `source` other internal files.
-- `bootstrap.sh` must be **POSIX sh**, not Zsh — it runs before Zsh is confirmed available.
-- Never add a new top-level file without updating this map.
-
----
-
-## 3. Zsh Coding Standards
-
-### 3.1 Variables
+### 2.1 Variables
 
 ```zsh
 # Always declare locals in functions
@@ -69,7 +48,7 @@ typeset -ga __ZERT_LOADED_PLUGINS
 - User-facing environment variables use `ZERT_` prefix (single).
 - Never use `global` or unscoped assignments inside functions.
 
-### 3.2 String Operations
+### 2.2 String Operations
 
 ```zsh
 # Use Zsh parameter expansion — no sed/awk for simple ops
@@ -88,7 +67,7 @@ local -a parts=("${(@s/::/)line}")  # split on ::
 - Use `(f)`, `(s::)`, `(j::)` flags aggressively — they are zero-fork.
 - Only fork to `grep`/`sed` when the operation requires regex or is on large files.
 
-### 3.4 Functions
+### 2.3 Functions
 
 ```zsh
 # Naming: _zert_<module>_<action>
@@ -108,7 +87,7 @@ _zert_cmd_update() { ... }
 - The main `zert` function dispatches to `_zert_cmd_*` based on the first argument.
 - Every function that can fail must `return 1` (not `exit`) on failure.
 
-### 3.5 Error Handling
+### 2.4 Error Handling
 
 ```zsh
 # Guard every git/curl call
@@ -134,7 +113,7 @@ version::1
 ```
 
 - Delimiter is `::`. Literal `::` inside a field must be escaped as `\::`.
-- Fields: `plugin_id`, `source` (`github`/`gitlab`/`local`/`ohmyzsh`/`prezto`), `url`, `commit_sha`, `options`.
+- Fields: `plugin_id`, `source` (`git`/`local`/`ohmyzsh`/`prezto`), `url`, `commit_sha`, `options`.
 - `options` is a comma-separated `key=value` list. No spaces around `=` or `,`.
 - Local plugins: `source=local`, `url` and `commit_sha` are empty strings (not omitted — fields are always present).
 
@@ -142,8 +121,7 @@ version::1
 
 | Source value | Example input | Meaning |
 |---|---|---|
-| `github` | `user/repo` or `https://github.com/user/repo` | GitHub clone which is actually `git` |
-| `git` | `https://gitlab.com/user/repo` | Git clone (can also be SSH) |
+| `git` | `user/repo`, `https://github.com/user/repo`, or `https://gitlab.com/user/repo` | Git clone (GitHub shorthand, full URL, or SSH) |
 | `local` | `/absolute/path/to/plugin` | Local directory |
 | `ohmyzsh` | `use ohmyzsh/lib/clipboard` | Subdirectory of Oh-My-Zsh repo |
 | `prezto` | `use prezto/modules/utility` | Subdirectory of Prezto repo |
@@ -163,7 +141,7 @@ Resolution logic must always follow this order. Never read a lower-priority sour
 
 ---
 
-## 7. UI Rules (`ui.zsh`)
+## 7. UI Rules
 
 - All output goes through ui functions. Never `echo`/`print` directly from logic files.
 - Color/ANSI codes must be defined as named variables in `ui.zsh` (e.g., `$__ZERT_CLR_GREEN`), never hardcoded inline in logic files.
@@ -202,7 +180,7 @@ fix(core): prevent exit call in sourced load path
 
 ---
 
-## 11. Before Submitting Any Change
+## 10. Before Submitting Any Change
 
 Run the checklist:
 - [ ] No new external binary dependencies introduced

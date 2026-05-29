@@ -44,7 +44,7 @@ fpath=("$_ZERT_BASE_DIR/functions" "$_ZERT_BASE_DIR/commands" $fpath)
 
 # Mark functions for autoload
 autoload -Uz _zert_check_deps
-autoload -Uz _zert_cmd_list _zert_cmd_update _zert_cmd_prune _zert_cmd_lock _zert_cmd_config _zert_cmd_use _zert_cmd_ohmyzsh _zert_cmd_prezto
+autoload -Uz _zert_cmd_list _zert_cmd_update _zert_cmd_prune _zert_cmd_use _zert_cmd_ohmyzsh _zert_cmd_prezto
 autoload -Uz _zert_ui_ok _zert_ui_error _zert_ui_log _zert_ui_progress _zert_ui_emphasize _zert_ui_truncate _zert_ui_pick_spinner _zert_ui_task_start _zert_ui_task_update _zert_ui_task_end _zert_ui_subtask_start _zert_ui_subtask_update _zert_ui_subtask_end _zert_ui_subtask_log _zert_ui_background_renderer
 autoload -Uz _zert_parse_source _zert_plugin_add _zert_should_fast_track _zert_fast_track
 autoload -Uz _zert_plugin_sanitize_id _zert_parse_flags _zert_lockfile_read_entry _zert_lockfile_write_entry _zert_lockfile_remove_entry
