@@ -17,16 +17,16 @@ _zert_plugin_ensure_sync() {
   lock_entry="$(_zert_lockfile_read_entry "$plugin_id")"
 
   if [[ -n "$lock_entry" ]]; then
-    local -a parts
+    local -a parts opt_pairs
+    local locked_sha lock_options lock_branch="" lock_pin=""
+    local opt key value
     parts=("${(@s/::/)lock_entry}")
-    local locked_sha="${parts[4]}"
-    local lock_options="${parts[5]}"
+    locked_sha="${parts[4]}"
+    lock_options="${parts[5]}"
 
-    local -a opt_pairs
     opt_pairs=("${(@s/,/)lock_options}")
-    local lock_branch="" lock_pin=""
     for opt in "${opt_pairs[@]}"; do
-      local key="${opt%%=*}" value="${opt#*=}"
+      key="${opt%%=*}" value="${opt#*=}"
       case "$key" in
         branch) lock_branch="$value" ;;
         pin)    lock_pin="$value" ;;

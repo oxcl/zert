@@ -1,19 +1,19 @@
 _zert_lockfile_write_entry() {
   local plugin_id="$1" source="$2" url="$3" commit_sha="$4"
   shift 4
-  local -a parts
+  local -a flag_parts
   while [[ $# -gt 0 ]]; do
     case "$1" in
-      --branch) shift; parts+=("branch=$1") ;;
-      --pin)    shift; parts+=("pin=$1")    ;;
-      --no-alias)         parts+=("no-alias=true")         ;;
-      --no-completion)    parts+=("no-completion=true")    ;;
-      --only-completion)  parts+=("only-completion=true")  ;;
+      --branch) shift; flag_parts+=("branch=$1") ;;
+      --pin)    shift; flag_parts+=("pin=$1")    ;;
+      --no-alias)         flag_parts+=("no-alias=true")         ;;
+      --no-completion)    flag_parts+=("no-completion=true")    ;;
+      --only-completion)  flag_parts+=("only-completion=true")  ;;
     esac
     shift
   done
   local IFS=","
-  local options="${parts[*]}"
+  local options="${flag_parts[*]}"
   local tmpfile="${ZERT_LOCKFILE}.tmp.$$"
   local found=0
 
@@ -24,14 +24,14 @@ _zert_lockfile_write_entry() {
 
   if [[ -f "$ZERT_LOCKFILE" ]]; then
     local line
+    local -a entry_parts
     while IFS= read -r line; do
       [[ "$line" = \#* || -z "$line" ]] && continue
       [[ "$line" = version::* ]] && continue
 
-      local -a parts
-      parts=("${(@s/::/)line}")
+      entry_parts=("${(@s/::/)line}")
 
-      if [[ "${parts[1]}" = "$plugin_id" ]]; then
+      if [[ "${entry_parts[1]}" = "$plugin_id" ]]; then
         # Replace existing entry
         print "${plugin_id}::${source}::${url}::${commit_sha}::${options}" >> "$tmpfile"
         found=1

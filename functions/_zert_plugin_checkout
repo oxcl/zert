@@ -11,15 +11,16 @@ _zert_plugin_checkout() {
   lock_entry="$(_zert_lockfile_read_entry "$plugin_id")"
 
   local lock_branch="" lock_pin="" locked_sha=""
+  local lock_options
+  local -a parts opt_pairs
+  local opt key value
   if [[ -n "$lock_entry" ]]; then
-    local -a parts
     parts=("${(@s/::/)lock_entry}")
     locked_sha="${parts[4]}"
-    local lock_options="${parts[5]}"
-    local -a opt_pairs
+    lock_options="${parts[5]}"
     opt_pairs=("${(@s/,/)lock_options}")
     for opt in "${opt_pairs[@]}"; do
-      local key="${opt%%=*}" value="${opt#*=}"
+      key="${opt%%=*}" value="${opt#*=}"
       case "$key" in
         branch) lock_branch="$value" ;;
         pin)    lock_pin="$value" ;;

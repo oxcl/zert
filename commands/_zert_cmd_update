@@ -5,30 +5,29 @@ _zert_cmd_update() {
   fi
 
   local updated=0 skipped=0 failed=0
-  local line
+  local line plugin_id source_type source_value commit_sha options
+  local is_pinned plugin_dir key value opt
+  local -a parts opt_pairs update_flags
 
   while IFS= read -r line; do
     [[ "$line" = \#* || -z "$line" ]] && continue
     [[ "$line" = version::* ]] && continue
 
-    local -a parts
     parts=("${(@s/::/)line}")
 
-    local plugin_id="${parts[1]}"
-    local source_type="${parts[2]}"
-    local source_value="${parts[3]}"
-    local commit_sha="${parts[4]}"
-    local options="${parts[5]}"
+    plugin_id="${parts[1]}"
+    source_type="${parts[2]}"
+    source_value="${parts[3]}"
+    commit_sha="${parts[4]}"
+    options="${parts[5]}"
 
     if [[ "$source_type" = "local" ]]; then
       continue
     fi
 
-    local is_pinned=0
+    is_pinned=0
     if [[ -n "$options" ]]; then
-      local -a opt_pairs
       opt_pairs=("${(@s/,/)options}")
-      local opt
       for opt in "${opt_pairs[@]}"; do
         if [[ "$opt" = pin=* ]]; then
           is_pinned=1
@@ -43,7 +42,7 @@ _zert_cmd_update() {
       continue
     fi
 
-    local plugin_dir="$ZERT_PLUGINS_DIR/$plugin_id"
+    plugin_dir="$ZERT_PLUGINS_DIR/$plugin_id"
     if [[ ! -d "$plugin_dir" ]]; then
       _zert_ui_log "Skipping **${plugin_id}** (not installed)"
       skipped=$(( skipped + 1 ))
@@ -52,13 +51,11 @@ _zert_cmd_update() {
 
     _zert_ui_log "Updating **${plugin_id}**..."
 
-    local -a update_flags
+    update_flags=()
     if [[ -n "$options" ]]; then
-      local -a opt_pairs
       opt_pairs=("${(@s/,/)options}")
-      local opt
       for opt in "${opt_pairs[@]}"; do
-        local key="${opt%%=*}" value="${opt#*=}"
+        key="${opt%%=*}" value="${opt#*=}"
         case "$key" in
           branch) update_flags+=("--branch" "$value") ;;
           no-alias) update_flags+=("--no-alias") ;;

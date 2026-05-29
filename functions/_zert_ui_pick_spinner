@@ -1,6 +1,7 @@
 _zert_ui_pick_spinner(){
     local i="$1"
-    idx=$(( i % 10 ))
+    local idx=$(( i % 10 ))
+    local ch=''
     case $idx in
             0) ch='⠋' ;;
             1) ch='⠙' ;;
@@ -13,5 +14,5 @@ _zert_ui_pick_spinner(){
             8) ch='⠇' ;;
             9) ch='⠏' ;;
     esac
-    printf "$ch"
+    printf '%s' "$ch"
 }

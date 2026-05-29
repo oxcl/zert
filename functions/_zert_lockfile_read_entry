@@ -4,13 +4,13 @@ _zert_lockfile_read_entry() {
   [[ ! -f "$ZERT_LOCKFILE" ]] && return 1
 
   local line
+  local -a parts
   while IFS= read -r line; do
     # Skip comments and empty lines
     [[ "$line" = \#* || -z "$line" ]] && continue
     # Skip version header
     [[ "$line" = version::* ]] && continue
 
-    local -a parts
     parts=("${(@s/::/)line}")
 
     if [[ "${parts[1]}" = "$plugin_id" ]]; then
