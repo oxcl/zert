@@ -1,7 +1,6 @@
 _zert_plugin_update() {
-  local plugin_id="$1" source_type="$2" source_value="$3"
-  shift 3
-  local plugin_dir="$ZERT_PLUGINS_DIR/$plugin_id"
+  local plugin_id="$1" source_type="$2" source_value="$3" plugin_dir="$4"
+  shift 4
 
   git -C "$plugin_dir" pull --ff-only 2>&1 || {
     git -C "$plugin_dir" fetch origin 2>&1 || return 1
