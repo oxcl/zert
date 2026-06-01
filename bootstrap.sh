@@ -7,6 +7,8 @@
 # [[ -f "$ZERT_PLUGINS_DIR/zert/zert.zsh" ]] || \
 # (curl -fsSL https://raw.githubusercontent.com/oxcl/zert/main/bootstrap.sh | zsh); \
 # source "$ZERT_PLUGINS_DIR/zert/zert.zsh"
+#
+# zert zert  # manage zert itself (optional, enables self-updates)
 
 set -e
 

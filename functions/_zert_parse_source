@@ -13,6 +13,13 @@ _zert_parse_source() {
     return 1
   fi
 
+  # Zert self-management
+  if [[ "$input" == "zert" ]]; then
+    __ZERT_SOURCE_TYPE="zert"
+    __ZERT_SOURCE_VALUE="https://github.com/oxcl/zert.git"
+    return 0
+  fi
+
   # Local path (absolute path starting with /)
   if [[ "$input" = /* ]]; then
     if [[ ! -d "$input" ]] && [[ ! -f "$input" ]]; then

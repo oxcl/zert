@@ -125,7 +125,7 @@ version::1
 | `local` | `/absolute/path/to/plugin` | Local directory |
 | `ohmyzsh` | `use ohmyzsh/lib/clipboard` | Subdirectory of Oh-My-Zsh repo |
 | `prezto` | `use prezto/modules/utility` | Subdirectory of Prezto repo |
-| `zert` | zert's own repo URL | Zert self-management (similar to ohmyzsh/prezto) |
+| `zert` | `zert zert` or `zert zert --branch dev` | Zert self-management (opt-in, user declares in .zshrc) |
 
 - Local plugins must be **absolute paths**. Reject relative paths with a clear error.
 - `ohmyzsh` and `prezto` source types clone the parent repo once and are shared.

@@ -26,22 +26,24 @@ No config files to maintain. No subcommands to memorize No external tools. Just 
 
 - **Inline, declarative syntax** — declare plugins directly in `.zshrc`. No separate config file.
 - **Lockfile-based reproducibility** — `zert.lock` pins every plugin to an exact git commit SHA. Commit it. Share it. Reproduce it anywhere.
-- **Parallel installs** — clones multiple plugins simultaneously using git treeless clonesfor minimal bandwidth.
+- **Parallel installs** — clones multiple plugins simultaneously using git treeless clones for minimal bandwidth.
 - **Zero external UI dependencies** — beautiful UI built entirely from ANSI escape codes.
-- **Self-managing** — Zert updates itself with `zert update zert`, managed as a first-class plugin.
+- **Self-managing** — Opt in with `zert zert` in your `.zshrc`. Zert tracks and updates itself like any other plugin.
 - **Oh-My-Zsh / Prezto compatibility** — load OMZ libs and Prezto modules without installing either framework.
 
 ---
 
 ## 🚀 Install
 
-Paste this single line at the top of your `.zshrc`:
+Paste this at the top of your `.zshrc`:
 
 ```zsh
 ZERT_PLUGINS_DIR="${ZERT_PLUGINS_DIR:-${ZERT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/zert}/plugins}"; \
 [[ -f "$ZERT_PLUGINS_DIR/zert/zert.zsh" ]] || \
 (curl -fsSL https://raw.githubusercontent.com/oxcl/zert/main/bootstrap.sh | zsh); \
 source "$ZERT_PLUGINS_DIR/zert/zert.zsh"
+
+zert zert  # manage zert itself (optional, enables self-updates)
 ```
 
 That's it. The first time your shell starts, Zert bootstraps itself. On every subsequent start, it loads instantly from the cached clone.
@@ -55,6 +57,10 @@ That's it. The first time your shell starts, Zert bootstraps itself. On every su
 Add `zert` lines to your `.zshrc` after the bootstrap line:
 
 ```zsh
+# Self-management (opt-in)
+zert zert                          # track zert itself in the lockfile
+zert zert --branch dev             # track a specific branch of zert
+
 # GitHub shorthand
 zert zsh-users/zsh-autosuggestions
 zert zsh-users/zsh-syntax-highlighting
@@ -130,14 +136,6 @@ export ZERT_PLUGINS_DIR="$ZERT_DIR/plugins" # Change where plugins are cloned
 export ZERT_LOCKFILE="$HOME/.zert.lock"     # Change the lockfile path
 ```
 
-Or use Zsh-native `zstyle` for non-path settings:
-
-```zsh
-zstyle ':zert:*' filter-tree true
-```
-
-**Priority:** env vars → zstyle → built-in defaults.
-
 ## 🏗️ How It Works
 
 ```
@@ -156,13 +154,6 @@ zstyle ':zert:*' filter-tree true
 
 **Install is parallel. Load is sequential.** This gives you the speed of parallel cloning without any of the ordering surprises.
 
-## 🤝 Contributing
-
-Zert is built in pure Zsh with no external dependencies. Before contributing, read:
-
-- [`AGENTS.md`](./AGENTS.md) — coding rules and invariants (also useful for AI agents)
-
----
 
 ## 📄 License
 
@@ -172,7 +163,7 @@ GNU General Public License v3.0 — see [`LICENSE`](./LICENSE) for details.
 
 <div align="center">
 
-**Built with no dependencies and unreasonable attention to detail.**
+**Built with unreasonable attention to detail.**
 
 [github.com/oxcl/zert](https://github.com/oxcl/zert)
 
