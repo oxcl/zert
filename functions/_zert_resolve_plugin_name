@@ -1,0 +1,51 @@
+_zert_resolve_plugin_name() {
+  local input="$1"
+  shift
+  local -a lockfile_ids=("$@")
+
+  local candidate_id=""
+
+  # Tier 1: Try parsing input as a source string
+  # Save and restore globals since _zert_parse_source has side effects
+  local saved_source_type="$__ZERT_SOURCE_TYPE"
+  local saved_source_value="$__ZERT_SOURCE_VALUE"
+
+  if _zert_parse_source "$input" 2>/dev/null; then
+    candidate_id="$(_zert_plugin_sanitize_id "$__ZERT_SOURCE_TYPE" "$__ZERT_SOURCE_VALUE" 2>/dev/null)"
+  fi
+
+  __ZERT_SOURCE_TYPE="$saved_source_type"
+  __ZERT_SOURCE_VALUE="$saved_source_value"
+
+  if [[ -n "$candidate_id" ]]; then
+    local id
+    for id in "${lockfile_ids[@]}"; do
+      if [[ "$id" == "$candidate_id" ]]; then
+        print -n "$id"
+        return 0
+      fi
+    done
+  fi
+
+  # Tier 2: Suffix match
+  local -a matches
+  local id last_segment
+  for id in "${lockfile_ids[@]}"; do
+    if [[ "$id" == *"--$input" ]]; then
+      matches+=("$id")
+    elif [[ "$id" == */"$input" ]]; then
+      matches+=("$id")
+    fi
+  done
+
+  if [[ ${#matches[@]} -eq 1 ]]; then
+    print -n "${matches[1]}"
+    return 0
+  elif [[ ${#matches[@]} -gt 1 ]]; then
+    _zert_ui_error "Multiple plugins match '$input': ${(j:, :)matches}. Use the full source name."
+    return 1
+  fi
+
+  _zert_ui_error "No plugin found matching: $input"
+  return 1
+}

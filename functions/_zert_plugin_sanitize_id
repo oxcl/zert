@@ -25,6 +25,10 @@ _zert_plugin_sanitize_id() {
       plugin_id="${plugin_id//\//--}"
       ;;
 
+    zert)
+      plugin_id="zert"
+      ;;
+
     local)
       plugin_id="local${source_value//\//--}"
       ;;

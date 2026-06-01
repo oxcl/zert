@@ -20,6 +20,34 @@ _zert_parse_source() {
     return 0
   fi
 
+  # Oh-My-Zsh framework
+  if [[ "$input" == "ohmyzsh" ]]; then
+    __ZERT_SOURCE_TYPE="ohmyzsh"
+    __ZERT_SOURCE_VALUE="ohmyzsh"
+    return 0
+  fi
+
+  # Oh-My-Zsh subcomponent (ohmyzsh/plugins/git, ohmyzsh/lib/clipboard, etc.)
+  if [[ "$input" == ohmyzsh/* ]]; then
+    __ZERT_SOURCE_TYPE="ohmyzsh"
+    __ZERT_SOURCE_VALUE="$input"
+    return 0
+  fi
+
+  # Prezto framework
+  if [[ "$input" == "prezto" ]]; then
+    __ZERT_SOURCE_TYPE="prezto"
+    __ZERT_SOURCE_VALUE="prezto"
+    return 0
+  fi
+
+  # Prezto subcomponent (prezto/modules/utility, etc.)
+  if [[ "$input" == prezto/* ]]; then
+    __ZERT_SOURCE_TYPE="prezto"
+    __ZERT_SOURCE_VALUE="$input"
+    return 0
+  fi
+
   # Local path (absolute path starting with /)
   if [[ "$input" = /* ]]; then
     if [[ ! -d "$input" ]] && [[ ! -f "$input" ]]; then

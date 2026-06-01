@@ -21,7 +21,7 @@ _zert_cmd_list() {
   local fixed_overhead=$(( type_width + sha_width + 3 ))
 
   # First pass: collect all data and find max content widths
-  local plugin_id source_type sha flags display_name
+  local plugin_id source_type source_value sha flags display_name
   local lock_entry options
   local -a parts
   local -a all_names all_types all_shas all_flags
@@ -42,8 +42,11 @@ _zert_cmd_list() {
       if [[ -n "$lock_entry" ]]; then
         parts=("${(@s/::/)lock_entry}")
         source_type="${parts[2]:-—}"
+        source_value="${parts[3]:-}"
         sha="${parts[4]:-—}"
         options="${parts[5]:-}"
+
+        display_name="$(_zert_display_name "$plugin_id" "$source_type" "$source_value")"
 
         if [[ -n "$sha" && "$sha" != "—" ]]; then
           sha="${sha[1,7]}"

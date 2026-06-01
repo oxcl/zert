@@ -1,0 +1,46 @@
+_zert_display_name() {
+  local plugin_id="$1"
+  local source_type="$2"
+  local source_value="$3"
+
+  case "$source_type" in
+    git)
+      # Strip protocol prefix
+      local stripped="${source_value#https://}"
+      stripped="${stripped#http://}"
+      stripped="${stripped#git://}"
+
+      # Handle SSH format: git@domain:owner/repo
+      if [[ "$stripped" = *@*:* ]]; then
+        stripped="${stripped#*@}"
+        local domain="${stripped%%:*}"
+        local path="${stripped#*:}"
+        stripped="$domain/$path"
+      fi
+
+      # Remove .git suffix
+      stripped="${stripped%.git}"
+
+      # Strip domain, keep owner/repo
+      # github.com/user/repo -> user/repo
+      if [[ "$stripped" = */*/* ]]; then
+        local without_domain="${stripped#*/}"
+        print -n "$without_domain"
+      else
+        print -n "$stripped"
+      fi
+      ;;
+
+    local)
+      print -n "$source_value"
+      ;;
+
+    ohmyzsh|prezto)
+      print -n "$source_value"
+      ;;
+
+    *)
+      print -n "$plugin_id"
+      ;;
+  esac
+}
