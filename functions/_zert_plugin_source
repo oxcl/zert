@@ -3,7 +3,7 @@ _zert_plugin_source() {
   local source_type="$2"
   shift 2
 
-  [[ "$source_type" == "ohmyzsh" || "$source_type" == "prezto" ]] && return 0
+  [[ "$source_type" == "ohmyzsh" || "$source_type" == "prezto" || "$source_type" == "zert" ]] && return 0
 
   local no_completion
   no_completion="$(_zert_parse_flags "no_completion" "$@")"

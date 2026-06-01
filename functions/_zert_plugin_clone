@@ -16,9 +16,15 @@ _zert_plugin_clone() {
   case "$source_type" in
     ohmyzsh) clone_url="https://github.com/ohmyzsh/ohmyzsh" ;;
     prezto)  clone_url="https://github.com/sorin-ionescu/prezto" ;;
+    zert)    clone_url="https://github.com/oxcl/zert.git" ;;
   esac
 
-  git clone ${clone_args[@]} "$clone_url" "$plugin_dir" 2>&1 || return 1
-
+  local tmpdir
+  tmpdir="$(mktemp -d "${plugin_dir}.zert-clone-XXXXXX")"
+  git clone ${clone_args[@]} "$clone_url" "$tmpdir" 2>&1 || {
+    rm -rf "$tmpdir"
+    return 1
+  }
+  mv "$tmpdir" "$plugin_dir"
   return 0
 }

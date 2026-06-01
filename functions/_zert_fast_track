@@ -1,7 +1,6 @@
 _zert_fast_track() {
   local line plugin_id source_type source_value commit_sha options
   local -a parts entries pids
-  local -A pid_to_plugin
   local idx=0 total=0 failed=0
 
   while IFS= read -r line; do
@@ -14,8 +13,16 @@ _zert_fast_track() {
 
   (( ${#entries[@]} == 0 )) && return 0
 
+  # Clean up stale clone tmpdirs from previous interrupted runs
+  local stale_tmpdir
+  for stale_tmpdir in "$ZERT_PLUGINS_DIR"/*.zert-clone-*(N); do
+    [[ -d "$stale_tmpdir" ]] && rm -rf "$stale_tmpdir"
+  done
+
+  local log_dir="/tmp/zert_logs"
+  mkdir -p "$log_dir" 2>/dev/null
+
   _zert_ui_task_start "Fast track: installing plugins..."
-  __ZERT_BG_PIDS+=("$__ZERT_BG_PID")
 
   setopt LOCAL_OPTIONS NO_NOTIFY NO_MONITOR
 
@@ -56,36 +63,37 @@ _zert_fast_track() {
       local plugin_dir="$ZERT_PLUGINS_DIR/$plugin_id"
       [[ "$source_type" == "ohmyzsh" ]] && plugin_dir="$ZERT_PLUGINS_DIR/ohmyzsh"
       [[ "$source_type" == "prezto" ]] && plugin_dir="$ZERT_PLUGINS_DIR/prezto"
+      local log_file="${log_dir}/${plugin_id//\//_}_${idx}.log"
 
-      if ! _zert_plugin_clone "$plugin_id" "$source_type" "$source_value" "${flags[@]}" >/dev/null 2>&1; then
-        _zert_ui_subtask_update $idx "${plugin_id} clone failed"
+      if ! _zert_plugin_clone "$plugin_id" "$source_type" "$source_value" "${flags[@]}" 2>"$log_file" >/dev/null; then
+        _zert_ui_subtask_update $idx "${plugin_id} clone failed — log: $log_file"
         _zert_ui_subtask_end $idx "fail"
         return 1
       fi
 
       if [[ -n "$commit_sha" ]]; then
         _zert_ui_subtask_update $idx "Checking out ${plugin_id}..."
-        if ! git -C "$plugin_dir" checkout "$commit_sha" >/dev/null 2>&1; then
-          _zert_ui_subtask_update $idx "${plugin_id} checkout failed"
+        if ! git -C "$plugin_dir" checkout "$commit_sha" 2>>"$log_file" >/dev/null; then
+          _zert_ui_subtask_update $idx "${plugin_id} checkout failed — log: $log_file"
           _zert_ui_subtask_end $idx "fail"
           return 1
         fi
       fi
 
       _zert_ui_subtask_update $idx "Compiling ${plugin_id}..."
-      if ! _zert_plugin_compile "$plugin_dir" >/dev/null 2>&1; then
-        _zert_ui_subtask_update $idx "${plugin_id} compile failed"
+      if ! _zert_plugin_compile "$plugin_dir" 2>>"$log_file" >/dev/null; then
+        _zert_ui_subtask_update $idx "${plugin_id} compile failed — log: $log_file"
         _zert_ui_subtask_end $idx "fail"
         return 1
       fi
 
+      rm -f "$log_file"
       _zert_ui_subtask_update $idx "Installed ${plugin_id}"
       _zert_ui_subtask_end $idx "ok"
       return 0
     ) &
 
     pids+=($!)
-    pid_to_plugin[$!]="$plugin_id"
     __ZERT_BG_PIDS+=("$!")
     (( idx++ ))
     (( total++ ))

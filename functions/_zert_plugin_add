@@ -13,20 +13,26 @@ _zert_plugin_add() {
   fi
 
   local plugin_id
-  plugin_id="$(_zert_plugin_sanitize_id "$source_type" "$source_value")"
-  if [[ -z "$plugin_id" ]]; then
-    _zert_ui_error "Failed to generate plugin ID for: $source_value"
-    return 1
+  local plugin_dir
+
+  if [[ "$source_type" == "zert" ]]; then
+    plugin_id="zert"
+    plugin_dir="$ZERT_PLUGINS_DIR/zert"
+  else
+    plugin_id="$(_zert_plugin_sanitize_id "$source_type" "$source_value")"
+    if [[ -z "$plugin_id" ]]; then
+      _zert_ui_error "Failed to generate plugin ID for: $source_value"
+      return 1
+    fi
+    if [[ "$source_type" == "local" ]]; then
+      plugin_dir="$source_value"
+    else
+      plugin_dir="$ZERT_PLUGINS_DIR/$plugin_id"
+    fi
   fi
 
   if [[ "${__ZERT_LOADED_PLUGINS[(i)$plugin_id]}" -le ${#__ZERT_LOADED_PLUGINS} ]]; then
     return 0
-  fi
-
-  if [[ "$source_type" == "local" ]]; then
-    local plugin_dir="$source_value"
-  else
-    local plugin_dir="$ZERT_PLUGINS_DIR/$plugin_id"
   fi
 
   local plugin_exists=true

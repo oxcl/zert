@@ -8,7 +8,7 @@ _zert_plugin_ensure_exists() {
       [[ -f "$source_value" ]] && return 0
       return 1
       ;;
-    ohmyzsh|prezto)
+    ohmyzsh|prezto|zert)
       [[ -d "$ZERT_PLUGINS_DIR/$source_type/.git" ]] && return 0
       return 1
       ;;

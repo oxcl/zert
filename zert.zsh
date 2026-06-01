@@ -54,3 +54,6 @@ autoload -Uz zert
 
 # Run dependency check
 _zert_check_deps || return 1
+
+# Self-register zert as a managed plugin
+_zert_plugin_add "zert" "https://github.com/oxcl/zert.git"
