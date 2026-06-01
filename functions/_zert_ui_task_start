@@ -6,7 +6,7 @@ _zert_ui_task_start(){
     __ZERT_TASK_ENDED=0
     __ZERT_INTERRUPTED=0
     __ZERT_BG_PIDS=()
-    trap 'rm -f "$__ZERT_COMM_FILE" 2>/dev/null' EXIT
+    trap '_zert_rm -f "$__ZERT_COMM_FILE" 2>/dev/null' EXIT
 
     # Start the renderer
     setopt LOCAL_OPTIONS NO_NOTIFY NO_MONITOR

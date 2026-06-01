@@ -12,5 +12,5 @@ _zert_ui_task_end(){
     wait "$__ZERT_BG_PID" 2>/dev/null
     
     exec 4>&-          # close writer
-    rm -f "$__ZERT_COMM_FILE" 2>/dev/null
+    _zert_rm -f "$__ZERT_COMM_FILE" 2>/dev/null
 }

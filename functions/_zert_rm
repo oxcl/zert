@@ -1,0 +1,31 @@
+_zert_rm() {
+  local -a paths
+  local -a flags
+
+  while [[ $# -gt 0 ]]; do
+    case "$1" in
+      -*)  flags+=("$1") ;;
+      *)   paths+=("$1") ;;
+    esac
+    shift
+  done
+
+  [[ ${#paths[@]} -eq 0 ]] && return 0
+
+  local tmp_prefix="${TMPDIR:-/tmp}/zert_"
+  local path
+  for path in "${paths[@]}"; do
+    [[ -z "$path" ]] && { _zert_ui_error "_zert_rm: empty path"; return 1 }
+
+    # Allow paths under known zert directories
+    [[ "$path" == "$ZERT_PLUGINS_DIR"/* ]] && continue
+    [[ "$path" == "$ZERT_DIR"/* ]] && continue
+    [[ "$path" == "$tmp_prefix"* ]] && continue
+    [[ "$path" == "$ZERT_LOCKFILE".tmp.* ]] && continue
+
+    _zert_ui_error "_zert_rm: refusing to delete path outside zert directories: $path"
+    return 1
+  done
+
+  command rm "${flags[@]}" "${paths[@]}"
+}

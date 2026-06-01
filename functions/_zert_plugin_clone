@@ -22,7 +22,7 @@ _zert_plugin_clone() {
   local tmpdir
   tmpdir="$(mktemp -d "${plugin_dir}.zert-clone-XXXXXX")"
   git clone ${clone_args[@]} "$clone_url" "$tmpdir" 2>&1 || {
-    rm -rf "$tmpdir"
+    _zert_rm -rf "$tmpdir"
     return 1
   }
   mv "$tmpdir" "$plugin_dir"

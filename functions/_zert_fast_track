@@ -16,7 +16,7 @@ _zert_fast_track() {
   # Clean up stale clone tmpdirs from previous interrupted runs
   local stale_tmpdir
   for stale_tmpdir in "$ZERT_PLUGINS_DIR"/*.zert-clone-*(N); do
-    [[ -d "$stale_tmpdir" ]] && rm -rf "$stale_tmpdir"
+    [[ -d "$stale_tmpdir" ]] && _zert_rm -rf "$stale_tmpdir"
   done
 
   local log_dir="${TMPDIR:-/tmp}/zert_logs"
@@ -87,7 +87,7 @@ _zert_fast_track() {
         return 1
       fi
 
-      rm -f "$log_file"
+      _zert_rm -f "$log_file"
       _zert_ui_subtask_update $idx "Installed ${plugin_id}"
       _zert_ui_subtask_end $idx "ok"
       return 0

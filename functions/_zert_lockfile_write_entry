@@ -47,7 +47,7 @@ _zert_lockfile_write_entry() {
 
   mv "$tmpfile" "$ZERT_LOCKFILE" || {
     _zert_ui_error "Failed to write lockfile: $ZERT_LOCKFILE"
-    rm -f "$tmpfile"
+    _zert_rm -f "$tmpfile"
     return 1
   }
 }

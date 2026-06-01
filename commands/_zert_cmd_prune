@@ -14,7 +14,7 @@ _zert_cmd_prune() {
 
     if [[ "${__ZERT_LOADED_PLUGINS[(i)$dir_name]}" -gt ${#__ZERT_LOADED_PLUGINS} ]]; then
       _zert_ui_log "Pruning **${dir_name}**..."
-      rm -rf "$dir" || {
+      _zert_rm -rf "$dir" || {
         _zert_ui_error "Failed to remove: $dir"
         continue
       }

@@ -28,7 +28,7 @@ _zert_lockfile_remove_entry() {
 
   if ! mv "$tmpfile" "$ZERT_LOCKFILE"; then
     _zert_ui_error "Failed to update lockfile: $ZERT_LOCKFILE"
-    rm -f "$tmpfile"
+    _zert_rm -f "$tmpfile"
     return 1
   fi
   return $(( 1 - found ))
