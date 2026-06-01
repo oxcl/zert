@@ -12,6 +12,12 @@
 
 set -e
 
+# Check for git
+command -v git >/dev/null 2>&1 || {
+    printf '[zert] git is required but not found.\n' >&2
+    exit 1
+}
+
 # Determine ZERT_PLUGINS_DIR with XDG defaults
 ZERT_PLUGINS_DIR="${ZERT_PLUGINS_DIR:-${ZERT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/zert}/plugins}"
 
@@ -31,8 +37,12 @@ cleanup() {
 }
 trap cleanup EXIT
 
-# Log message in cyan to stderr before cloning
-printf '\033[36m[zert] Downloading zert to %s/zert...\033[0m\n' "$ZERT_PLUGINS_DIR" >&2
+# Log message (respects NO_COLOR)
+if [ -z "$NO_COLOR" ]; then
+    printf '\033[36m[zert] Downloading zert to %s/zert...\033[0m\n' "$ZERT_PLUGINS_DIR" >&2
+else
+    printf '[zert] Downloading zert to %s/zert...\n' "$ZERT_PLUGINS_DIR" >&2
+fi
 
 # Clone zert repository (shallow, single-branch for minimal bandwidth)
 git clone --filter=tree:0 --single-branch --branch main --depth 1 https://github.com/oxcl/zert.git "$TMPDIR_ZERT/zert"
