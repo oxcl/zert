@@ -19,7 +19,7 @@ _zert_fast_track() {
     [[ -d "$stale_tmpdir" ]] && rm -rf "$stale_tmpdir"
   done
 
-  local log_dir="/tmp/zert_logs"
+  local log_dir="${TMPDIR:-/tmp}/zert_logs"
   mkdir -p "$log_dir" 2>/dev/null
 
   _zert_ui_task_start "Fast track: installing plugins..."

@@ -1,5 +1,5 @@
 _zert_ui_task_start(){
-    local comm_file="/tmp/zert_ui_comm_$$"
+    local comm_file="${TMPDIR:-/tmp}/zert_ui_comm_$$"
     mkfifo "$comm_file" || { _zert_ui_error "Failed to create FIFO"; return 1 }
     
     __ZERT_COMM_FILE="$comm_file"

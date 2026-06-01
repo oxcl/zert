@@ -6,7 +6,7 @@ _zert_use_prezto() {
   export ZPREZTODIR="$ZERT_PLUGINS_DIR/prezto"
 
   if [[ -f "$ZPREZTODIR/modules/helper/init.zsh" ]]; then
-    source "$ZPREZTODIR/modules/helper/init.zsh" 2>/dev/null
+    source "$ZPREZTODIR/modules/helper/init.zsh"
   fi
 
   local mod_func_dir
@@ -14,5 +14,5 @@ _zert_use_prezto() {
     fpath=("$mod_func_dir" $fpath)
   done
 
-  __ZERT_USE_PREZTO=1
+  typeset -g __ZERT_USE_PREZTO=1
 }

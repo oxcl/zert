@@ -1,9 +1,9 @@
 _zert_ui_background_renderer(){
     local parent_pid="$1"
     local comm_file="$2"
-    local lines_count=0 i=0
-    typeset -A ui_state
-    typeset -a log_ring
+    local lines_count=0 i=0 old_lines_count=0 j=0
+    local -A ui_state
+    local -a log_ring
     local log_max=5
 
     exec 3<>"$comm_file"

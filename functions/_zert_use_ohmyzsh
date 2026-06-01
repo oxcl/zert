@@ -10,5 +10,5 @@ _zert_use_ohmyzsh() {
 
   fpath=("$ZSH/functions" "$ZSH/completions" "$ZSH_CACHE_DIR/completions" $fpath)
 
-  __ZERT_USE_OMZ=1
+  typeset -g __ZERT_USE_OMZ=1
 }

@@ -5,7 +5,7 @@ _zert_cmd_prune() {
   fi
 
   local pruned=0
-  local dir_name
+  local dir_name dir
 
   for dir in "$ZERT_PLUGINS_DIR"/*(N/); do
     dir_name="${dir:t}"
