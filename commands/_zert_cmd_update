@@ -4,9 +4,36 @@ _zert_cmd_update() {
     return 1
   fi
 
+  local -a requested_names=("$@")
+  local -A update_filter=()
+  local filter_mode=0
+
+  # Collect all plugin_ids from lockfile for name resolution
+  local -a all_plugin_ids=()
+  local _line _parts
+  while IFS= read -r _line; do
+    [[ "$_line" = \#* || -z "$_line" ]] && continue
+    [[ "$_line" = version::* ]] && continue
+    _parts=("${(@s/::/)_line}")
+    [[ -n "${_parts[1]}" ]] && all_plugin_ids+=("${_parts[1]}")
+  done < "$ZERT_LOCKFILE"
+
+  # Resolve requested plugin names to plugin_ids
+  if [[ ${#requested_names[@]} -gt 0 ]]; then
+    filter_mode=1
+    local name resolved
+    for name in "${requested_names[@]}"; do
+      resolved="$(_zert_resolve_plugin_name "$name" "${all_plugin_ids[@]}")"
+      if [[ $? -ne 0 ]]; then
+        return 1
+      fi
+      update_filter[$resolved]=1
+    done
+  fi
+
   local updated=0 skipped=0 failed=0
   local line plugin_id source_type source_value commit_sha options
-  local is_pinned plugin_dir key value opt subtask_idx
+  local display_name is_pinned plugin_dir key value opt subtask_idx
   local -a parts opt_pairs update_flags
 
   while IFS= read -r line; do
@@ -20,6 +47,11 @@ _zert_cmd_update() {
     source_value="${parts[3]}"
     commit_sha="${parts[4]}"
     options="${parts[5]}"
+
+    # Skip plugins not in the filter set when filtering
+    if [[ $filter_mode -eq 1 && -z "${update_filter[$plugin_id]+x}" ]]; then
+      continue
+    fi
 
     if [[ "$source_type" = "local" ]]; then
       continue
@@ -47,7 +79,8 @@ _zert_cmd_update() {
       continue
     fi
 
-    _zert_ui_task_start "Updating **${plugin_id}**..."
+    display_name="$(_zert_display_name "$plugin_id" "$source_type" "$source_value")"
+    _zert_ui_task_start "Updating **${display_name}**..."
     subtask_idx=0
 
     _zert_ui_subtask_start $subtask_idx "Pulling latest changes"
@@ -71,7 +104,7 @@ _zert_cmd_update() {
     if [[ ${pipestatus[1]} -ne 0 ]]; then
       _zert_ui_subtask_update $subtask_idx "Pull failed!"
       _zert_ui_subtask_end $subtask_idx "fail"
-      _zert_ui_task_end "fail" "failed to update **${plugin_id}**."
+      _zert_ui_task_end "fail" "failed to update **${display_name}**."
       failed=$(( failed + 1 ))
       continue
     fi
@@ -84,7 +117,7 @@ _zert_cmd_update() {
     if [[ ${pipestatus[1]} -ne 0 ]]; then
       _zert_ui_subtask_update $subtask_idx "Compile failed!"
       _zert_ui_subtask_end $subtask_idx "fail"
-      _zert_ui_task_end "fail" "failed to compile **${plugin_id}**."
+      _zert_ui_task_end "fail" "failed to compile **${display_name}**."
       failed=$(( failed + 1 ))
       continue
     fi
