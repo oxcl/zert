@@ -8,6 +8,8 @@ _zert_source_file() {
 
   [[ "$only_completion" == "true" ]] && return 0
 
+  [[ -f "$filepath" ]] || { _zert_ui_error "File not found: $filepath"; return 1; }
+
   if [[ "$no_alias" == "true" ]]; then
     function alias() { :; }
   fi
