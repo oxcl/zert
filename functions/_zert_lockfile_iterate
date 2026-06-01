@@ -1,0 +1,35 @@
+#!/usr/bin/env zsh
+# Iterate over all plugin entries in the lockfile, calling a callback for each.
+#
+# Usage: _zert_lockfile_iterate callback_function
+#
+# The callback receives 5 positional arguments for each entry:
+#   $1 = plugin_id   — sanitized identifier (e.g. "github.com--user--repo")
+#   $2 = source_type — "git", "local", "ohmyzsh", "prezto", or "zert"
+#   $3 = source_value — URL, path, or framework name
+#   $4 = commit_sha  — locked commit hash (empty for local)
+#   $5 = options     — comma-separated key=value flags (e.g. "branch=dev,pin=abc123")
+#
+# If the callback returns non-zero, iteration stops early and this function
+# returns 1. Otherwise returns 0.
+#
+# Skips comment lines, blank lines, and the version::N header automatically.
+
+_zert_lockfile_iterate() {
+  local callback="$1"
+
+  [[ -f "$ZERT_LOCKFILE" ]] || return 0
+
+  local line
+  local -a parts
+  while IFS= read -r line; do
+    [[ "$line" = \#* || -z "$line" ]] && continue
+    [[ "$line" = version::* ]] && continue
+
+    parts=("${(@s/::/)line}")
+
+    "$callback" "${parts[1]}" "${parts[2]}" "${parts[3]}" "${parts[4]}" "${parts[5]}" || return 1
+  done < "$ZERT_LOCKFILE"
+
+  return 0
+}

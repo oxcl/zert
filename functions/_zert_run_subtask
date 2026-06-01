@@ -1,0 +1,38 @@
+# Run a command as a subtask with standard UI lifecycle handling.
+#
+# Starts a subtask, runs the command with its output streamed to the
+# subtask log (real-time), and reports success/failure. Returns the
+# command's exit code. The caller handles flow control (return/break/continue).
+#
+# Usage: _zert_run_subtask idx label success_msg fail_msg [fail_task_msg] -- command [args...]
+#
+#   idx           — subtask index for _zert_ui_subtask_* calls
+#   label         — text shown while the command is running
+#   success_msg   — text shown on success (replaces label)
+#   fail_msg      — text shown on failure (replaces label)
+#   fail_task_msg — (optional) if set, ends the parent task on failure
+#   --            — separator; everything after is the command to run
+#
+# Returns the command's exit code.
+
+_zert_run_subtask() {
+  local idx="$1" label="$2" success_msg="$3" fail_msg="$4" fail_task_msg="$5"
+  shift 5
+  [[ "$1" == "--" ]] && shift
+
+  _zert_ui_subtask_start $idx "$label"
+
+  "$@" 2>&1 | _zert_ui_subtask_log 4
+  local rc=${pipestatus[1]}
+
+  if [[ $rc -eq 0 ]]; then
+    _zert_ui_subtask_update $idx "$success_msg"
+    _zert_ui_subtask_end $idx "ok"
+  else
+    _zert_ui_subtask_update $idx "$fail_msg"
+    _zert_ui_subtask_end $idx "fail"
+    [[ -n "$fail_task_msg" ]] && _zert_ui_task_end "fail" "$fail_task_msg"
+  fi
+
+  return $rc
+}

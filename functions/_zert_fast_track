@@ -1,8 +1,26 @@
+# Parallel install all non-local plugins from the lockfile in one batch.
+#
+# This is a first-run optimization. When _zert_should_fast_track returns true
+# (lockfile exists, plugins directory is empty or only contains zert), we
+# clone/checkout/compile every lockfile entry in parallel background jobs
+# instead of one-by-one during _zert_plugin_add calls.
+#
+# Each plugin is cloned in a subshell (runs as a background job). Errors are
+# captured to per-plugin log files. After all jobs complete, the UI reports
+# how many succeeded/failed.
+#
+# Local plugins are skipped (they don't need cloning). Already-cloned
+# directories are also skipped (idempotent).
+#
+# After fast_track completes, the normal _zert_plugin_add calls will find
+# the plugins already on disk and just source them.
+
 _zert_fast_track() {
   local line plugin_id source_type source_value commit_sha options
   local -a parts entries pids
   local idx=0 total=0 failed=0
 
+  # Collect all non-local entries from the lockfile
   while IFS= read -r line; do
     [[ "$line" = \#* || -z "$line" ]] && continue
     [[ "$line" = version::* ]] && continue
@@ -24,6 +42,8 @@ _zert_fast_track() {
 
   _zert_ui_task_start "Fast track: installing plugins..."
 
+  # NO_NOTIFY: don't trap on child status changes
+  # NO_MONITOR: don't track background jobs for job control
   setopt LOCAL_OPTIONS NO_NOTIFY NO_MONITOR
 
   for line in "${entries[@]}"; do
@@ -34,6 +54,7 @@ _zert_fast_track() {
     commit_sha="${parts[4]}"
     options="${parts[5]}"
 
+    # Skip if already cloned (idempotent re-run)
     case "$source_type" in
       ohmyzsh) [[ -d "$ZERT_PLUGINS_DIR/ohmyzsh/.git" ]] && continue ;;
       prezto)  [[ -d "$ZERT_PLUGINS_DIR/prezto/.git" ]] && continue ;;
@@ -42,6 +63,7 @@ _zert_fast_track() {
 
     _zert_ui_subtask_start $idx "Cloning ${plugin_id}..."
 
+    # Reconstruct clone flags from the lockfile options string
     local -a flags
     if [[ -n "$options" ]]; then
       local -a opt_pairs
@@ -59,6 +81,8 @@ _zert_fast_track() {
       done
     fi
 
+    # Each plugin installs in its own subshell (background job).
+    # Errors go to a per-plugin log file; on success the log is deleted.
     (
       local plugin_dir="$ZERT_PLUGINS_DIR/$plugin_id"
       [[ "$source_type" == "ohmyzsh" ]] && plugin_dir="$ZERT_PLUGINS_DIR/ohmyzsh"
@@ -99,11 +123,13 @@ _zert_fast_track() {
     (( total++ ))
   done
 
+  # Nothing to install (all were already cloned)
   if (( total == 0 )); then
     _zert_ui_task_end "ok"
     return 0
   fi
 
+  # Wait for all background jobs and count failures
   for pid in "${pids[@]}"; do
     wait "$pid"
     if [[ $? -ne 0 ]]; then

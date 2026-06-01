@@ -1,7 +1,30 @@
+# Main plugin installation/loading orchestrator.
+#
+# Called when the user declares a plugin in their .zshrc (e.g. `zert user/repo`).
+# Handles the full lifecycle: fast-track check → ID generation → duplicate
+# detection → existence check → sync check → clone → register/checkout/pull
+# → compile → source.
+#
+# Flow:
+#   1. On the first call, attempt fast_track (parallel batch install from lockfile)
+#   2. Generate a sanitized plugin_id and resolve the on-disk directory
+#   3. Skip if this plugin_id was already loaded (duplicate guard)
+#   4. If the plugin exists on disk and is already synced with the lockfile,
+#      just source it immediately (fast path — no UI, no git ops)
+#   5. Otherwise, run the full configure flow with task/subtask UI:
+#      a. Clone (if not on disk)
+#      b. Sync with lockfile (register / checkout / pull)
+#      c. Clean stale .zwc files and recompile
+#      d. Source the plugin
+
 _zert_plugin_add() {
   local source_type="$1" source_value="$2"
   shift 2
 
+  # ---Fast-track (one-time parallel install) ---
+  # On the very first _zert_plugin_add call, check if we can install all
+  # lockfile entries in parallel. This is a first-run optimization: the
+  # plugins dir is empty, so we clone everything at once instead of one-by-one.
   if [[ -z "$__ZERT_FAST_TRACK_ATTEMPTED" ]]; then
     __ZERT_FAST_TRACK_ATTEMPTED=1
     if _zert_should_fast_track; then
@@ -12,6 +35,7 @@ _zert_plugin_add() {
     fi
   fi
 
+  # --- Resolve plugin ID and directory ---
   local plugin_id
   local plugin_dir
 
@@ -31,122 +55,108 @@ _zert_plugin_add() {
     fi
   fi
 
+  # --- Duplicate guard ---
+  # If this plugin_id is already in the loaded list, skip it.
+  # The (i) flag returns the index of the element; if it's > array length, it's absent.
   if [[ "${__ZERT_LOADED_PLUGINS[(i)$plugin_id]}" -le ${#__ZERT_LOADED_PLUGINS} ]]; then
     return 0
   fi
 
+  # ---  Check existence and sync state ---
   local plugin_exists=true
   _zert_plugin_ensure_exists "$source_type" "$source_value" || plugin_exists=false
 
   local sync_action="synced"
   $plugin_exists && sync_action="$(_zert_plugin_ensure_sync "$plugin_id" "$source_type" "$source_value" "$@")"
 
+  # Fast path: plugin is on disk and already at the right commit — just source it
   if $plugin_exists && [[ "$sync_action" == "synced" ]]; then
     _zert_plugin_source "$plugin_dir" "$source_type" "$@" || return 1
     __ZERT_LOADED_PLUGINS+=("$plugin_id")
     return 0
   fi
 
+  # --- Full configure flow (with UI) ---
   _zert_ui_task_start "Configuring plugin **${plugin_id}**..."
   local subtask_idx=0
 
+  # Clone if the plugin directory doesn't exist yet
   if ! $plugin_exists; then
-    _zert_ui_subtask_start $subtask_idx "Cloning repository"
-    _zert_plugin_clone "$plugin_id" "$source_type" "$source_value" "$@" 2>&1 | _zert_ui_subtask_log 4
-    # pipestatus[1] = exit code of the left side of the pipe (the command, not the log consumer)
-    if [[ ${pipestatus[1]} -ne 0 ]]; then
-      _zert_ui_subtask_update $subtask_idx "Clone failed!"
-      _zert_ui_subtask_end $subtask_idx "fail"
-      _zert_ui_task_end "fail" "failed to clone the repository with git."
-      return 1
-    fi
-    _zert_ui_subtask_update $subtask_idx "Cloned repository"
-    _zert_ui_subtask_end $subtask_idx "ok"
+    _zert_run_subtask $subtask_idx \
+      "Cloning repository" \
+      "Cloned repository" \
+      "Clone failed!" \
+      "failed to clone the repository with git." \
+      -- _zert_plugin_clone "$plugin_id" "$source_type" "$source_value" "$@" || return 1
     (( subtask_idx++ ))
   fi
 
+  # Sync with lockfile (register, checkout, or pull as needed)
   sync_action="$(_zert_plugin_ensure_sync "$plugin_id" "$source_type" "$source_value" "$@")"
   if [[ "$sync_action" != "synced" ]]; then
-    _zert_ui_subtask_start $subtask_idx "Cleaning compiled files"
-    find "$plugin_dir" -name "*.zwc" -type f -delete  2>&1 | _zert_ui_subtask_log 
-    if [[ ${pipestatus[1]} -ne 0 ]]; then
-      _zert_ui_subtask_update $subtask_idx "Cleaning compiled files failed!"
-      _zert_ui_subtask_end $subtask_idx "fail"
-      _zert_ui_task_end "fail" "failed to clean compiled files."
-      return 1
-    fi
-    _zert_ui_subtask_update $subtask_idx "Cleaned compiled files"
-    _zert_ui_subtask_end $subtask_idx "ok"
+    # Clean stale compiled files before making any git changes
+    _zert_run_subtask $subtask_idx \
+      "Cleaning compiled files" \
+      "Cleaned compiled files" \
+      "Cleaning compiled files failed!" \
+      "failed to clean compiled files." \
+      -- find "$plugin_dir" -name "*.zwc" -type f -delete || return 1
     (( subtask_idx++ ))
-
 
     case "$sync_action" in
       register)
-        _zert_ui_subtask_start $subtask_idx "Registering plugin in lockfile"
-        _zert_plugin_register "$plugin_id" "$source_type" "$source_value" "$@" 2>&1 | _zert_ui_subtask_log 4
-        if [[ ${pipestatus[1]} -ne 0 ]]; then
-          _zert_ui_subtask_update $subtask_idx "Registering plugin in lockfile failed!"
-          _zert_ui_subtask_end $subtask_idx "fail"
-          _zert_ui_task_end "fail" "failed to register plugin in lockfile."
-          return 1
-        fi
-        _zert_ui_subtask_update $subtask_idx "Registered plugin in lockfile"
-        _zert_ui_subtask_end $subtask_idx "ok"
+        # No lockfile entry exists — write one with the current HEAD commit.
+        # Inlined from _zert_plugin_register (trivial: just rev-parse + write).
+        _zert_run_subtask $subtask_idx \
+          "Registering plugin in lockfile" \
+          "Registered plugin in lockfile" \
+          "Registering plugin in lockfile failed!" \
+          "failed to register plugin in lockfile." \
+          -- _zert_lockfile_write_entry "$plugin_id" "$source_type" "$source_value" \
+              "$(git -C "$plugin_dir" rev-parse HEAD 2>/dev/null)" "$@" || return 1
         (( subtask_idx++ ))
         ;;
       checkout)
-        _zert_ui_subtask_start $subtask_idx "Checking out locked version"
-        _zert_plugin_checkout "$plugin_id" "$source_type" "$source_value" "$@" 2>&1 | _zert_ui_subtask_log 4
-        if [[ ${pipestatus[1]} -ne 0 ]]; then
-          _zert_ui_subtask_update $subtask_idx "Checking out locked version failed!"
-          _zert_ui_subtask_end $subtask_idx "fail"
-          _zert_ui_task_end "fail" "failed to checkout locked version."
-          return 1
-        fi
-        _zert_ui_subtask_update $subtask_idx "Checked out locked version"
-        _zert_ui_subtask_end $subtask_idx "ok"
+        # Locked commit/branch exists locally — just switch to it
+        _zert_run_subtask $subtask_idx \
+          "Checking out locked version" \
+          "Checked out locked version" \
+          "Checking out locked version failed!" \
+          "failed to checkout locked version." \
+          -- _zert_plugin_checkout "$plugin_id" "$source_type" "$source_value" "$@" || return 1
         (( subtask_idx++ ))
         ;;
       pull)
-        _zert_ui_subtask_start $subtask_idx "Pulling to match locked version"
-        _zert_plugin_pull     "$plugin_id" "$source_type" "$source_value" "$@" 2>&1 | _zert_ui_subtask_log 4
-        if [[ ${pipestatus[1]} -ne 0 ]]; then
-          _zert_ui_subtask_update $subtask_idx "Pulling to match locked version failed!"
-          _zert_ui_subtask_end $subtask_idx "fail"
-          _zert_ui_task_end "fail" "failed to pull to match locked version."
-          return 1
-        fi
-        _zert_ui_subtask_update $subtask_idx "Pulled to match locked version"
-        _zert_ui_subtask_end $subtask_idx "ok"
+        # Locked commit isn't available locally — fetch it first, then checkout
+        _zert_run_subtask $subtask_idx \
+          "Pulling to match locked version" \
+          "Pulled to match locked version" \
+          "Pulling to match locked version failed!" \
+          "failed to pull to match locked version." \
+          -- _zert_plugin_pull "$plugin_id" "$source_type" "$source_value" "$@" || return 1
         (( subtask_idx++ ))
 
-        _zert_ui_subtask_start $subtask_idx "Checking out locked version"
-        _zert_plugin_checkout "$plugin_id" "$source_type" "$source_value" "$@" 2>&1 | _zert_ui_subtask_log 4
-        if [[ ${pipestatus[1]} -ne 0 ]]; then
-          _zert_ui_subtask_update $subtask_idx "Checking out locked version failed!"
-          _zert_ui_subtask_end $subtask_idx "fail"
-          _zert_ui_task_end "fail" "failed to checkout locked version."
-          return 1
-        fi
-        _zert_ui_subtask_update $subtask_idx "Checked out locked version"
-        _zert_ui_subtask_end $subtask_idx "ok"
+        _zert_run_subtask $subtask_idx \
+          "Checking out locked version" \
+          "Checked out locked version" \
+          "Checking out locked version failed!" \
+          "failed to checkout locked version." \
+          -- _zert_plugin_checkout "$plugin_id" "$source_type" "$source_value" "$@" || return 1
         (( subtask_idx++ ))
-
         ;;
     esac
-    _zert_ui_subtask_start $subtask_idx "Compiling files"
-    _zert_plugin_compile "$plugin_dir" 2>&1 | _zert_ui_subtask_log 4
-    if [[ ${pipestatus[1]} -ne 0 ]]; then
-      _zert_ui_subtask_update $subtask_idx "Compiling files failed!"
-      _zert_ui_subtask_end $subtask_idx "fail"
-      _zert_ui_task_end "fail" "failed to compile plugin files."
-      return 1
-    fi
-    _zert_ui_subtask_update $subtask_idx "Compiled files"
-    _zert_ui_subtask_end $subtask_idx "ok"
+
+    # Recompile all .zsh files after git operations
+    _zert_run_subtask $subtask_idx \
+      "Compiling files" \
+      "Compiled files" \
+      "Compiling files failed!" \
+      "failed to compile plugin files." \
+      -- _zert_plugin_compile "$plugin_dir" || return 1
     (( subtask_idx++ ))
   fi
 
+  # Source the plugin into the current shell
   _zert_ui_subtask_start $subtask_idx "Sourcing plugin"
   _zert_plugin_source "$plugin_dir" "$source_type" "$@" || {
     _zert_ui_subtask_update $subtask_idx "Sourcing plugin failed!"

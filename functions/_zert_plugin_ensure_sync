@@ -1,7 +1,32 @@
+# Determine what action is needed to bring a plugin in sync with its lockfile entry.
+#
+# Compares the plugin's current git state against the lockfile and the flags
+# passed by the user. Returns one of the following action strings via stdout:
+#
+#   "synced"    — plugin is already at the correct commit; no action needed.
+#   "register"  — no lockfile entry exists for this plugin; it needs to be
+#                 registered (i.e. write a new lockfile entry with the current HEAD).
+#   "checkout"  — the target commit/branch/pin exists locally in the repo but
+#                 HEAD doesn't point to it; a git checkout is needed.
+#   "pull"      — the target commit/branch/pin is not available locally;
+#                 a git fetch is needed before we can checkout.
+#
+# Decision logic when a lockfile entry exists:
+#   1. If user-requested branch differs from locked branch:
+#        branch exists locally → "checkout", otherwise → "pull"
+#   2. If user-requested pin differs from locked pin:
+#        pin exists locally → "checkout", otherwise → "pull"
+#   3. If locked SHA differs from current HEAD:
+#        SHA exists locally → "checkout", otherwise → "pull"
+#   4. Otherwise → "synced"
+#
+# Local plugins always return "synced" (they are not git-managed).
+
 _zert_plugin_ensure_sync() {
   local plugin_id="$1" source_type="$2" source_value="$3"
   shift 3
 
+  # Local plugins are not git-managed; nothing to sync
   if [[ "$source_type" == "local" ]]; then
     print -n "synced"
     return 0
@@ -9,10 +34,12 @@ _zert_plugin_ensure_sync() {
 
   local plugin_dir="$ZERT_PLUGINS_DIR/$plugin_id"
 
+  # What the user is requesting right now (from their .zshrc flags)
   local branch pin
   branch="$(_zert_parse_flags "branch" "$@")"
   pin="$(_zert_parse_flags "pin" "$@")"
 
+  # What the lockfile has recorded
   local lock_entry
   lock_entry="$(_zert_lockfile_read_entry "$plugin_id")"
 
@@ -24,6 +51,7 @@ _zert_plugin_ensure_sync() {
     locked_sha="${parts[4]}"
     lock_options="${parts[5]}"
 
+    # Parse locked options to extract branch/pin
     opt_pairs=("${(@s/,/)lock_options}")
     for opt in "${opt_pairs[@]}"; do
       key="${opt%%=*}" value="${opt#*=}"
@@ -33,6 +61,7 @@ _zert_plugin_ensure_sync() {
       esac
     done
 
+    # Branch mismatch: need to switch branches
     if [[ "$lock_branch" != "$branch" ]]; then
       if git -C "$plugin_dir" rev-parse --verify "refs/heads/$branch" &>/dev/null; then
         print -n "checkout"
@@ -42,6 +71,7 @@ _zert_plugin_ensure_sync() {
       return 0
     fi
 
+    # Pin mismatch: need to switch to a different commit
     if [[ "$lock_pin" != "$pin" ]]; then
       if git -C "$plugin_dir" cat-file -e "$pin" &>/dev/null; then
         print -n "checkout"
@@ -51,6 +81,7 @@ _zert_plugin_ensure_sync() {
       return 0
     fi
 
+    # SHA drift: HEAD doesn't match what the lockfile says
     if [[ -n "$locked_sha" ]]; then
       local current_sha=""
       current_sha="$(git -C "$plugin_dir" rev-parse HEAD 2>/dev/null)"
@@ -65,9 +96,11 @@ _zert_plugin_ensure_sync() {
       fi
     fi
   else
+    # No lockfile entry at all; this plugin needs to be registered
     print -n "register"
     return 0
   fi
 
+  # Everything matches — already in sync
   print -n "synced"
 }

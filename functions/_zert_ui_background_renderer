@@ -1,3 +1,42 @@
+# Background renderer process for task/subtask UI.
+#
+# Runs as a background job. Reads key=value commands from a FIFO and
+# renders a live task display with spinner, subtask tree, and log ring.
+#
+# IPC Protocol (via FIFO):
+#   The main shell writes messages to FD 4 (opened on the same FIFO).
+#   Each message is a single line in the form "key=value".
+#
+#   Task-level keys:
+#     task_name=<text>     — set/update the main task label
+#     task_status=<state>  — "ongoing", "ok", or "fail"
+#     message=<text>       — final summary message shown after task_done
+#     task_done=1          — signals the renderer to draw the final state and exit
+#
+#   Subtask-level keys:
+#     subtask_N_title=<text>   — set/update the label for subtask index N
+#     subtask_N_status=<state> — "ongoing", "ok", or "fail"
+#
+#   Log ring keys:
+#     log_max=<N>       — set max visible log lines (ring buffer size = N+1)
+#     log_clear=1       — flush the log ring buffer
+#     log_line=<text>   — append a log line (escape protocol below)
+#
+#   Escape protocol for log_line values:
+#     literal \  →  \\   (escaped backslash)
+#     literal =  →  \=   (escaped equals)
+#     literal \n →  actual newline
+#     The renderer decodes these on read.
+#
+# FD layout:
+#   FD 3 — read end of the FIFO, opened by this renderer process
+#   FD 4 — write end of the FIFO, opened by the main shell in _zert_ui_task_start
+#
+# The renderer loops at ~10 Hz (sleep 0.1), redrawing the full block each
+# iteration. It moves the cursor up to overwrite the previous frame in-place.
+# When the parent process exits (kill -0 fails) or task_done=1 is received,
+# the renderer draws the final state and exits cleanly.
+
 _zert_ui_background_renderer(){
     local parent_pid="$1"
     local comm_file="$2"
@@ -6,12 +45,14 @@ _zert_ui_background_renderer(){
     local -a log_ring
     local log_max=5
 
+    # Open the FIFO for reading (FD 3)
     exec 3<>"$comm_file"
 
     while true; do
+        # Exit if the parent shell has terminated
         kill -0 $parent_pid 2>/dev/null || break
 
-        # Read all available lines from the FIFO and update the UI state
+        # Drain all available messages from the FIFO and update state
         while IFS= read -t 0.05 -u 3 line; do
             local key="${line%%=*}"
             local value="${line#*=}"
@@ -23,6 +64,7 @@ _zert_ui_background_renderer(){
                     log_ring=()
                     ;;
                 log_line)
+                    # Decode the escape protocol: \= → =, \n → newline, \\ → \
                     local decoded="$value"
                     decoded="${decoded//\\=/=}"
                     decoded="${decoded//\\n/$'\n'}"
@@ -36,12 +78,12 @@ _zert_ui_background_renderer(){
             esac
         done
 
-        # Move cursor up to overwrite previous output
+        # Move cursor up to overwrite previous frame
         old_lines_count=$lines_count
         [[ $lines_count -gt 0 ]] && printf "\033[${lines_count}A"
         (( lines_count = 0 ))
 
-        # print the icon for the task
+        # --- Render task status icon ---
         if [[ $ui_state[task_status] == "ongoing" ]]; then
             printf '\r%s%s%s%s' "${__ZERT_CLR_BOLD}" "${__ZERT_CLR_CYAN}" "$(_zert_ui_pick_spinner $i)" "${__ZERT_CLR_RESET}"
         elif [[ $ui_state[task_status] == "ok" ]]; then
@@ -52,18 +94,18 @@ _zert_ui_background_renderer(){
             printf '\r%s%s?%s' "${__ZERT_CLR_BOLD}" "${__ZERT_CLR_GRAY}" "${__ZERT_CLR_RESET}"
         fi
 
-        # print the task name
+        # --- Render task name ---
         printf ' %s\033[K\n' "$(_zert_ui_emphasize "$ui_state[task_name]")"
         (( lines_count++ ))
 
-        # Count total subtasks first
+        # Count total subtasks so we can draw tree connectors
         local subtask_index=0 total_subtasks=0
         while [[ -n "${ui_state[subtask_${subtask_index}_title]}" ]]; do
             (( total_subtasks++ ))
             (( subtask_index++ ))
         done
 
-        # print subtasks in order with tree structure
+        # --- Render subtask tree ---
         subtask_index=0
         while [[ -n "${ui_state[subtask_${subtask_index}_title]}" ]]; do
             local subtask_title="${ui_state[subtask_${subtask_index}_title]}"
@@ -86,28 +128,29 @@ _zert_ui_background_renderer(){
             (( lines_count++ ))
             (( subtask_index++ ))
         done
-        # print log ring buffer — oldest at top, newest at bottom
+
+        # --- Render log ring buffer (oldest at top, newest at bottom) ---
         local ring_len=${#log_ring[@]}
         if (( ring_len > 0 )); then
             for (( j=1; j<ring_len; j++ )); do
                 printf ' │ %s%s%s\033[K%s\n' "${__ZERT_CLR_ITALIC}" "${__ZERT_CLR_GRAY}" "${log_ring[$j]:0:70}" "${__ZERT_CLR_RESET}"
                 (( lines_count++ ))
             done
-            # pad top with blank lines to keep block height stable
+            # Pad with blank lines to keep block height stable across frames
             for (( j=ring_len; j<log_max; j++ )); do
                 printf ' │  \n'
                 (( lines_count++ ))
             done
         fi
 
-        # clean up any remaining lines from previous render
+        # Clean up leftover lines from the previous (possibly taller) frame
         local extra_lines=$(( old_lines_count - lines_count ))
         for (( j=0; j<extra_lines; j++ )); do
             printf '\r\033[K\n'
         done
         [[ $extra_lines -gt 0 ]] && printf "\033[${extra_lines}A"
 
-        # Exit cleanly after rendering the final state
+        # --- Final frame: task_done signals we should render the result and exit ---
         if [[ $ui_state[task_done] == "1" ]]; then
             if [[ -n "$ui_state[message]" ]]; then
                 if [[ "$ui_state[task_status]" == "ok" ]]; then
@@ -124,5 +167,7 @@ _zert_ui_background_renderer(){
         sleep 0.1
         (( i++ ))
     done
+
+    # Close the read end of the FIFO
     exec 3>&-
 }
