@@ -1,4 +1,6 @@
 _zert_cmd_prezto() {
+  setopt localoptions extendedglob
+
   if [[ -z "$__ZERT_USE_PREZTO" ]]; then
     _zert_ui_error "prezto not initialized. Run 'zert use prezto' first."
     return 1
@@ -25,5 +27,7 @@ _zert_cmd_prezto() {
     (( ${#funcs} )) && autoload -Uz "${funcs[@]}"
   fi
 
-  _zert_use_source_file "$module_dir" "init.zsh" "prezto:modules/$module" "$@"
+  if [ -f "$module_dir/init.zsh" ]; then
+    _zert_use_source_file "$module_dir" "init.zsh" "prezto:modules/$module" "$@"
+  fi
 }

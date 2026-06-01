@@ -10,14 +10,14 @@ Progress key: `[ ]` todo · `[~]` in progress · `[x]` done
 
 - [x] 1.1 Fresh install — run bootstrap on clean system with no `$ZERT_PLUGINS_DIR`, verify `zert/zert.zsh` and `zert/zert.plugin.zsh` created
 - [x] 1.2 Idempotency — run bootstrap twice, second run should `exit 0` immediately
-- [ ] 1.3 Custom `ZERT_PLUGINS_DIR` — set to custom path, verify clone lands there
-- [ ] 1.4 Custom `ZERT_DIR` — set `ZERT_DIR` (no `ZERT_PLUGINS_DIR`), verify resolves to `$ZERT_DIR/plugins`
-- [ ] 1.5 XDG fallback — unset both `ZERT_DIR` and `ZERT_PLUGINS_DIR`, verify falls back to `$XDG_DATA_HOME/zert/plugins` or `~/.local/share/zert/plugins`
-- [ ] 1.6 Atomic clone — verify temp directory used during clone and removed after `mv`
-- [ ] 1.7 Cleanup on failure — interrupt bootstrap mid-clone, verify temp directory cleaned via trap
-- [ ] 1.8 No Zsh required — verify bootstrap runs under plain `sh` without Zsh in PATH
-- [ ] 1.9 Network failure — test with unreachable remote, verify error message and non-zero exit
-- [ ] 1.10 Existing partial install — create `zert.zsh` but not `zert.plugin.zsh`, verify clone runs
+- [x] 1.3 Custom `ZERT_PLUGINS_DIR` — set to custom path, verify clone lands there
+- [x] 1.4 Custom `ZERT_DIR` — set `ZERT_DIR` (no `ZERT_PLUGINS_DIR`), verify resolves to `$ZERT_DIR/plugins`
+- [x] 1.5 XDG fallback — unset both `ZERT_DIR` and `ZERT_PLUGINS_DIR`, verify falls back to `$XDG_DATA_HOME/zert/plugins` or `~/.local/share/zert/plugins`
+- [x] 1.6 Atomic clone — verify temp directory used during clone and removed after `mv`
+- [x] 1.7 Cleanup on failure — interrupt bootstrap mid-clone, verify temp directory cleaned via trap
+- [x] 1.8 No Zsh required — verify bootstrap runs under plain `sh` without Zsh in PATH
+- [x] 1.9 Network failure — test with unreachable remote, verify error message and non-zero exit
+- [x] 1.10 Existing partial install — create `zert.zsh` but not `zert.plugin.zsh`, verify clone runs
 
 ---
 
@@ -34,42 +34,42 @@ Progress key: `[ ]` todo · `[~]` in progress · `[x]` done
 
 ## Category 3 — Source Parsing (`_zert_parse_source`)
 
-- [ ] 3.1 GitHub shorthand — `zsh-users/zsh-autosuggestions` → type=`git`, value=`https://github.com/zsh-users/zsh-autosuggestions.git`
-- [ ] 3.2 Full HTTPS URL — `https://github.com/user/repo.git` → type=`git`, value=URL
-- [ ] 3.3 GitLab URL — `https://gitlab.com/user/repo` → type=`git`, value=URL
-- [ ] 3.4 SSH URL — `git@github.com:user/repo.git` → type=`git`, value=URL
-- [ ] 3.5 Absolute local path — `/home/user/plugin` → type=`local`, value=path (if exists)
-- [ ] 3.6 Relative path rejected — `./my-plugin` → error + return 1
-- [ ] 3.7 Nonexistent local path — `/nonexistent/path` → error + return 1
-- [ ] 3.8 Empty input — `""` → error + return 1
-- [ ] 3.9 `ohmyzsh` source — `ohmyzsh` → type=`ohmyzsh`, value=`ohmyzsh`
-- [ ] 3.10 `prezto` source — `prezto` → type=`prezto`, value=`prezto`
-- [ ] 3.11 GitHub URL without `.git` — `https://github.com/user/repo` → type=`git`
-- [ ] 3.12 Trailing slash handling — `https://github.com/user/repo/` → handled correctly
+- [x] 3.1 GitHub shorthand — `zsh-users/zsh-autosuggestions` → type=`git`, value=`https://github.com/zsh-users/zsh-autosuggestions.git`
+- [x] 3.2 Full HTTPS URL — `https://github.com/user/repo.git` → type=`git`, value=URL
+- [x] 3.3 GitLab URL — `https://gitlab.com/user/repo` → type=`git`, value=URL
+- [x] 3.4 SSH URL — `git@github.com:user/repo.git` → type=`git`, value=URL
+- [x] 3.5 Absolute local path — `/home/user/plugin` → type=`local`, value=path (if exists)
+- [x] 3.6 Relative path rejected — `./my-plugin` → error + return 1
+- [x] 3.7 Nonexistent local path — `/nonexistent/path` → error + return 1
+- [x] 3.8 Empty input — `""` → error + return 1
+- [x] 3.9 `ohmyzsh` source — `ohmyzsh` → type=`ohmyzsh`, value=`ohmyzsh`
+- [x] 3.10 `prezto` source — `prezto` → type=`prezto`, value=`prezto`
+- [x] 3.11 GitHub URL without `.git` — `https://github.com/user/repo` → type=`git`
+- [x] 3.12 Trailing slash handling — `https://github.com/user/repo/` → handled correctly
 
 ---
 
 ## Category 4 — Flag Parsing (`_zert_parse_flags`)
 
-- [ ] 4.1 Boolean flag — `--no-alias` → `"true"`
-- [ ] 4.2 Value flag — `--branch main` → `"main"`
-- [ ] 4.3 Missing flag — query for `--branch` when not present → `""`
-- [ ] 4.4 Pin flag — `--pin abc123` → `"abc123"`
-- [ ] 4.5 Multiple flags — `--no-alias --branch dev --pin xyz` → each parses correctly
-- [ ] 4.6 Underscore normalization — query `no_alias` → matches `--no-alias`
-- [ ] 4.7 Flag at end of args — `--no-alias` as last arg (no value after) → `"true"`
+- [x] 4.1 Boolean flag — `--no-alias` → `"true"`
+- [x] 4.2 Value flag — `--branch main` → `"main"`
+- [x] 4.3 Missing flag — query for `--branch` when not present → `""`
+- [x] 4.4 Pin flag — `--pin abc123` → `"abc123"`
+- [x] 4.5 Multiple flags — `--no-alias --branch dev --pin xyz` → each parses correctly
+- [x] 4.6 Underscore normalization — query `no_alias` → matches `--no-alias`
+- [x] 4.7 Flag at end of args — `--no-alias` as last arg (no value after) → `"true"`
 
 ---
 
 ## Category 5 — Plugin ID Sanitization (`_zert_plugin_sanitize_id`)
 
-- [ ] 5.1 GitHub shorthand — `git` + `https://github.com/zsh-users/zsh-autosuggestions.git` → `github.com--zsh-users--zsh-autosuggestions`
-- [ ] 5.2 GitLab URL — `git` + `https://gitlab.com/user/repo` → `gitlab.com--user--repo`
-- [ ] 5.3 SSH format — `git` + `git@github.com:user/repo.git` → correct sanitized ID
-- [ ] 5.4 Local path — `local` + `/home/user/plugin` → `local--home--user--plugin`
-- [ ] 5.5 `.git` suffix stripped — URL ending in `.git` → suffix removed
-- [ ] 5.6 Trailing slashes — URL with trailing `/` → handled correctly
-- [ ] 5.7 Special chars in path — paths with dots, hyphens, underscores → sanitized correctly
+- [x] 5.1 GitHub shorthand — `git` + `https://github.com/zsh-users/zsh-autosuggestions.git` → `github.com--zsh-users--zsh-autosuggestions`
+- [x] 5.2 GitLab URL — `git` + `https://gitlab.com/user/repo` → `gitlab.com--user--repo`
+- [x] 5.3 SSH format — `git` + `git@github.com:user/repo.git` → correct sanitized ID
+- [x] 5.4 Local path — `local` + `/home/user/plugin` → `local--home--user--plugin`
+- [x] 5.5 `.git` suffix stripped — URL ending in `.git` → suffix removed
+- [x] 5.6 Trailing slashes — URL with trailing `/` → handled correctly
+- [x] 5.7 Special chars in path — paths with dots, hyphens, underscores → sanitized correctly
 
 ---
 
