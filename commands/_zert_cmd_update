@@ -96,4 +96,14 @@ _zert_cmd_update() {
     fi
     updated=$(( updated + 1 ))
   done < "$ZERT_LOCKFILE"
+
+  if (( updated > 0 )); then
+    _zert_ui_ok "Updated **${updated}** plugin(s)"
+  fi
+  if (( skipped > 0 )); then
+    _zert_ui_log "Skipped **${skipped}** plugin(s)"
+  fi
+  if (( failed > 0 )); then
+    _zert_ui_error "Failed to update **${failed}** plugin(s)"
+  fi
 }
