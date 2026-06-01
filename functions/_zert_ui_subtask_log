@@ -1,20 +1,10 @@
 _zert_ui_subtask_log(){
     local max_lines="${1:-4}"
-    print "log_max=$max_lines" >&4
+    print -r "log_max=$max_lines" >&4
 
-    # Read on \r delimiter (git progress uses \r to overwrite lines)
-    while IFS= read -d $'\r' -r chunk; do
-        local -a segments=("${(f)chunk}")
-        local line encoded
-        for line in "${segments[@]}"; do
-            [[ -z "$line" ]] && continue
-
-            # Escape protocol: \ -> \\, newline -> \n, = -> \=
-            encoded="$line"
-            encoded="${encoded//\\/\\\\}"
-            encoded="${encoded//$'\n'/\\n}"
-            encoded="${encoded//=/\\=}"
-            print "log_line=$encoded" >&4
-        done
+    while IFS= read -d $'\r' -r line; do
+        [[ -z "$line" ]] && continue
+        # Escape protocol: \ -> \\, newline -> \n, = -> \=
+        print -r "log_line=${${${${line}//\\/\\\\}//$'\n'/\\n}//=/\\=}" >&4
     done
 }
