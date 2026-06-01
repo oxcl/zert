@@ -1,18 +1,34 @@
 _zert_ui_pick_spinner(){
     local i="$1"
-    local idx=$(( i % 10 ))
-    local ch=''
-    case $idx in
-            0) ch='⠋' ;;
-            1) ch='⠙' ;;
-            2) ch='⠹' ;;
-            3) ch='⠸' ;;
-            4) ch='⠼' ;;
-            5) ch='⠴' ;;
-            6) ch='⠦' ;;
-            7) ch='⠧' ;;
-            8) ch='⠇' ;;
-            9) ch='⠏' ;;
-    esac
-    printf '%s' "$ch"
+
+    # Detect Unicode support once (check locale for UTF-8)
+    if [[ -z "$__ZERT_HAS_UNICODE" ]]; then
+        local lc="${LC_ALL:-${LC_CTYPE:-${LANG:-}}}"
+        if [[ "$lc" == *UTF-8* || "$lc" == *utf8* ]]; then
+            typeset -g __ZERT_HAS_UNICODE=1
+        else
+            typeset -g __ZERT_HAS_UNICODE=0
+        fi
+    fi
+
+    if (( __ZERT_HAS_UNICODE )); then
+        local idx=$(( i % 10 ))
+        local ch=''
+        case $idx in
+                0) ch='⠋' ;;
+                1) ch='⠙' ;;
+                2) ch='⠹' ;;
+                3) ch='⠸' ;;
+                4) ch='⠼' ;;
+                5) ch='⠴' ;;
+                6) ch='⠦' ;;
+                7) ch='⠧' ;;
+                8) ch='⠇' ;;
+                9) ch='⠏' ;;
+        esac
+        printf '%s' "$ch"
+    else
+        local -a ascii=( '|' '/' '-' '\' )
+        printf '%s' "${ascii[$(( i % 4 ))]}"
+    fi
 }
