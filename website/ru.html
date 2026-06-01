@@ -1,10 +1,10 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ru">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Zert — The Plugin Manager Your .zshrc Has Been Waiting For</title>
-  <meta name="description" content="Zert is a pure-Zsh plugin manager with npm-style lockfiles, parallel installs, and declarative inline configuration.">
+  <title>Zert — Менеджер плагинов, который ждал ваш .zshrc</title>
+  <meta name="description" content="Zert — это чистый менеджер плагинов Zsh с lock-файлами в стиле npm, параллельной установкой и декларативной inline-конфигурацией.">
   <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
   <meta name="theme-color" content="#282828">
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -15,28 +15,28 @@
 <body>
   <nav class="nav" id="nav">
     <div class="nav-inner">
-      <a href="#" class="nav-logo">
+      <a href="index.html" class="nav-logo">
         <img src="logo.png" alt="Zert" class="nav-logo-img">
         <span class="nav-logo-text">zert</span>
       </a>
-      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+      <button class="nav-toggle" id="navToggle" aria-label="Переключить меню">
         <span></span><span></span><span></span>
       </button>
       <ul class="nav-links" id="navLinks">
-        <li><a href="#features">Features</a></li>
-        <li><a href="#how-it-works">How It Works</a></li>
-        <li><a href="#usage">Usage</a></li>
-        <li><a href="#install">Install</a></li>
+        <li><a href="#features">Возможности</a></li>
+        <li><a href="#how-it-works">Как это работает</a></li>
+        <li><a href="#usage">Использование</a></li>
+        <li><a href="#install">Установка</a></li>
         <li>
           <div class="nav-lang" id="navLang">
-            <button class="nav-lang-btn" id="navLangBtn" aria-label="Select language">
-              🌐 EN
+            <button class="nav-lang-btn" id="navLangBtn" aria-label="Выбрать язык">
+              🌐 RU
               <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
             </button>
             <div class="nav-lang-dropdown" id="navLangDropdown">
-              <a href="index.html" class="nav-lang-option active">🇺🇸 English</a>
+              <a href="index.html" class="nav-lang-option">🇺🇸 English</a>
               <a href="zh.html" class="nav-lang-option">🇨🇳 中文</a>
-              <a href="ru.html" class="nav-lang-option">🇷🇺 Русский</a>
+              <a href="ru.html" class="nav-lang-option active">🇷🇺 Русский</a>
               <a href="es.html" class="nav-lang-option">🇪🇸 Español</a>
               <a href="pt.html" class="nav-lang-option">🇧🇷 Português</a>
             </div>
@@ -54,15 +54,14 @@
         <canvas id="heroCanvas"></canvas>
       </div>
       <div class="hero-content">
-        <div class="hero-badge animate-in">Open Source &amp; Pure Zsh</div>
+        <div class="hero-badge animate-in">Открытый код &amp; Чистый Zsh</div>
         <h1 class="hero-title animate-in">
-          The plugin manager your
+          Менеджер плагинов, который ждал ваш
           <span class="hero-highlight">.zshrc</span>
-          has been waiting for
         </h1>
         <p class="hero-subtitle animate-in">
-          Declare plugins inline. Lock to exact commits. Install in parallel.
-          Zero dependencies beyond Zsh and Git.
+          Объявляйте плагины прямо в коде. Фиксируйте на точных коммитах. Устанавливайте параллельно.
+          Нулевые зависимости помимо Zsh и Git.
         </p>
         <div class="hero-demo animate-in">
           <div class="demo-card">
@@ -73,23 +72,23 @@
               <span class="demo-title">~/.zshrc</span>
             </div>
             <div class="demo-body">
-              <div class="demo-line"><span class="demo-comment"># declare your plugins</span></div>
+              <div class="demo-line"><span class="demo-comment"># объявите ваши плагины</span></div>
               <div class="demo-line"><span class="demo-keyword">zert</span> zsh-users/zsh-autosuggestions</div>
               <div class="demo-line"><span class="demo-keyword">zert</span> zsh-users/zsh-syntax-highlighting</div>
               <div class="demo-line"><span class="demo-keyword">zert</span> ohmyzsh lib/clipboard</div>
-              <div class="demo-line"><span class="demo-keyword">zert</span> <span class="demo-keyword">zert</span> <span class="demo-comment"># zert manages itself</span></div>
+              <div class="demo-line"><span class="demo-keyword">zert</span> <span class="demo-keyword">zert</span> <span class="demo-comment"># zert управляет собой</span></div>
             </div>
             <div class="demo-footer">
               <span class="demo-status"></span>
-              Open a new shell — Zert handles the rest
+              Откройте новый терминал — Zert сделает всё остальное
             </div>
           </div>
         </div>
         <div class="hero-badges animate-in">
           <span class="badge">Zsh 5.0+</span>
-          <span class="badge">Pure Zsh</span>
+          <span class="badge">Чистый Zsh</span>
           <span class="badge">GPLv3</span>
-          <span class="badge">No Config Files</span>
+          <span class="badge">Без файлов конфигурации</span>
         </div>
       </div>
       <div class="hero-scroll-hint">
@@ -102,9 +101,9 @@
         <div class="bootstrap-card reveal">
           <div class="bootstrap-glow"></div>
           <div class="bootstrap-header">
-            <span class="section-tag">Quick Start</span>
-            <h2>Add this to your <code>.zshrc</code></h2>
-            <p>Paste the snippet below. On first shell launch, Zert clones itself automatically.</p>
+            <span class="section-tag">Быстрый старт</span>
+            <h2>Добавьте это в ваш <code>.zshrc</code></h2>
+            <p>Вставьте фрагмент кода ниже. При первом запуске shell Zert автоматически клонирует себя.</p>
           </div>
           <div class="bootstrap-code">
             <div class="bootstrap-code-header">
@@ -119,22 +118,22 @@ source "$ZERT_PLUGINS_DIR/zert/zert.zsh"
 
 # declare plugins
 zert zsh-users/zsh-autosuggestions
-zert zsh-users/zsh-syntax-highlighting' aria-label="Copy code">
+zert zsh-users/zsh-syntax-highlighting' aria-label="Скопировать код">
                 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
               </button>
             </div>
-            <pre class="bootstrap-pre"><code><span class="code-comment"># bootstrap zert — runs once, self-clones on first launch</span>
+            <pre class="bootstrap-pre"><code><span class="code-comment"># бутстрап zert — запускается один раз, автоматически клонируется при первом запуске</span>
 <span class="code-var">ZERT_PLUGINS_DIR</span>=<span class="code-string">"${ZERT_PLUGINS_DIR:-${ZERT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/zert}/plugins}"</span>
 <span class="code-kw">[[</span> <span class="code-flag">-f</span> <span class="code-string">"$ZERT_PLUGINS_DIR/zert/zert.zsh"</span> <span class="code-kw">]]</span> <span class="code-operator">||</span> \
   <span class="code-kw">(</span><span class="code-cmd">curl</span> <span class="code-flag">-fsSL</span> https://raw.githubusercontent.com/oxcl/zert/main/bootstrap.sh <span class="code-operator">|</span> <span class="code-cmd">zsh</span><span class="code-kw">)</span>
 <span class="code-cmd">source</span> <span class="code-string">"$ZERT_PLUGINS_DIR/zert/zert.zsh"</span>
 
-<span class="code-comment"># declare your plugins</span>
+<span class="code-comment"># объявите ваши плагины</span>
 <span class="code-cmd">zert</span> zsh-users/zsh-autosuggestions
 <span class="code-cmd">zert</span> zsh-users/zsh-syntax-highlighting
-<span class="code-cmd">zert</span> <span class="code-cmd">zert</span>  <span class="code-comment"># zert manages itself</span></code></pre>
+<span class="code-cmd">zert</span> <span class="code-cmd">zert</span>  <span class="code-comment"># zert управляет собой</span></code></pre>
           </div>
-          <p class="bootstrap-note">Open a new terminal and Zert handles the rest — cloning, compiling, and loading your plugins automatically.</p>
+          <p class="bootstrap-note">Откройте новый терминал, и Zert сделает всё остальное — автоматически клонирует, компилирует и загружает ваши плагины.</p>
         </div>
       </div>
     </section>
@@ -142,52 +141,52 @@ zert zsh-users/zsh-syntax-highlighting' aria-label="Copy code">
     <section class="features" id="features">
       <div class="container">
         <div class="section-header reveal">
-          <span class="section-tag">Features</span>
-          <h2>Everything you need. Nothing you don't.</h2>
-          <p>No Python. No Ruby. No Node. Just Zsh doing what Zsh does best.</p>
+          <span class="section-tag">Возможности</span>
+          <h2>Всё что нужно. Ничего лишнего.</h2>
+          <p>Нет Python. Нет Ruby. Нет Node. Только Zsh делает то, что он умеет лучше всего.</p>
         </div>
         <div class="features-grid">
           <div class="feature-card reveal">
             <div class="feature-icon">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 00-2 2v16a2 2 0 002 2h12a2 2 0 002-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><polyline points="10 9 9 9 8 9"/></svg>
             </div>
-            <h3>Declarative</h3>
-            <p>Declare plugins directly in your <code>.zshrc</code>. No separate config file. No YAML, TOML, or JSON — just <code>zert user/repo</code>.</p>
+            <h3>Декларативный</h3>
+            <p>Объявляйте плагины прямо в вашем <code>.zshrc</code>. Нет отдельного файла конфигурации. Нет YAML, TOML или JSON — просто <code>zert user/repo</code>.</p>
           </div>
           <div class="feature-card reveal">
             <div class="feature-icon">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
             </div>
-            <h3>Lockfile Reproducibility</h3>
-            <p>Every plugin pinned to an exact commit SHA in <code>zert.lock</code>. Commit it to dotfiles for bit-for-bit identical installs everywhere.</p>
+            <h3>Воспроизводимость через lock-файл</h3>
+            <p>Каждый плагин зафиксирован на точном SHA коммита в <code>zert.lock</code>. Закоммитьте его в dotfiles для бит-в-бит идентичных установок везде.</p>
           </div>
           <div class="feature-card reveal">
             <div class="feature-icon">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
             </div>
-            <h3>Parallel Installs</h3>
-            <p>Missing plugins cloned simultaneously with git treeless clones. Install is parallel, load is sequential — no ordering surprises.</p>
+            <h3>Параллельная установка</h3>
+            <p>Отсутствующие плагины клонируются одновременно с помощью git treeless clones. Установка параллельная, загрузка последовательная — без сюрпризов с порядком.</p>
           </div>
           <div class="feature-card reveal">
             <div class="feature-icon">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
             </div>
-            <h3>Zero Dependencies</h3>
-            <p>Pure Zsh. No Python, Ruby, Node, or Perl. Only external binaries: <code>git</code>, <code>curl</code>, and standard POSIX tools.</p>
+            <h3>Нулевые зависимости</h3>
+            <p>Чистый Zsh. Нет Python, Ruby, Node или Perl. Только внешние бинарные файлы: <code>git</code>, <code>curl</code> и стандартные инструменты POSIX.</p>
           </div>
           <div class="feature-card reveal">
             <div class="feature-icon">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
             </div>
-            <h3>Self-Managing</h3>
-            <p>Add <code>zert zert</code> to your <code>.zshrc</code> and Zert tracks and updates itself like any other plugin. Even on a specific branch.</p>
+            <h3>Самоуправление</h3>
+            <p>Добавьте <code>zert zert</code> в ваш <code>.zshrc</code>, и Zert будет отслеживать и обновлять себя, как любой другой плагин. Даже на определённой ветке.</p>
           </div>
           <div class="feature-card reveal">
             <div class="feature-icon">
               <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 016.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 014 19.5v-15A2.5 2.5 0 016.5 2z"/></svg>
             </div>
-            <h3>OMZ &amp; Prezto Compatible</h3>
-            <p>Load Oh-My-Zsh libraries and Prezto modules without installing either framework. Use <code>zert use ohmyzsh</code> and <code>zert use prezto</code>.</p>
+            <h3>Совместимость с OMZ &amp; Prezto</h3>
+            <p>Загружайте библиотеки Oh-My-Zsh и модули Prezto без установки этих фреймворков. Используйте <code>zert use ohmyzsh</code> и <code>zert use prezto</code>.</p>
           </div>
         </div>
       </div>
@@ -196,40 +195,40 @@ zert zsh-users/zsh-syntax-highlighting' aria-label="Copy code">
     <section class="how-it-works" id="how-it-works">
       <div class="container">
         <div class="section-header reveal">
-          <span class="section-tag">How It Works</span>
-          <h2>Four steps. That's it.</h2>
-          <p>From zero to a fully managed shell in under a minute.</p>
+          <span class="section-tag">Как это работает</span>
+          <h2>Четыре шага. Вот и всё.</h2>
+          <p>От нуля до полностью управляемого shell менее чем за минуту.</p>
         </div>
         <div class="steps">
           <div class="step reveal">
             <div class="step-number">1</div>
             <div class="step-content">
-              <h3>Bootstrap</h3>
-              <p>Paste the install snippet into your <code>.zshrc</code>. On first run, Zert clones itself automatically.</p>
+              <h3>Бутстрап</h3>
+              <p>Вставьте фрагмент установки в ваш <code>.zshrc</code>. При первом запуске Zert автоматически клонирует себя.</p>
             </div>
           </div>
           <div class="step-connector reveal"></div>
           <div class="step reveal">
             <div class="step-number">2</div>
             <div class="step-content">
-              <h3>Declare</h3>
-              <p>Add <code>zert user/repo</code> lines below the bootstrap. Use flags like <code>--pin</code>, <code>--branch</code>, or <code>--no-alias</code>.</p>
+              <h3>Объявление</h3>
+              <p>Добавьте строки <code>zert user/repo</code> под бутстрапом. Используйте флаги like <code>--pin</code>, <code>--branch</code> или <code>--no-alias</code>.</p>
             </div>
           </div>
           <div class="step-connector reveal"></div>
           <div class="step reveal">
             <div class="step-number">3</div>
             <div class="step-content">
-              <h3>Install</h3>
-              <p>Open a new shell. Zert detects missing plugins, clones them in parallel, compiles, and writes <code>zert.lock</code>.</p>
+              <h3>Установка</h3>
+              <p>Откройте новый shell. Zert обнаруживает отсутствующие плагины, клонирует их параллельно, компилирует и записывает <code>zert.lock</code>.</p>
             </div>
           </div>
           <div class="step-connector reveal"></div>
           <div class="step reveal">
             <div class="step-number">4</div>
             <div class="step-content">
-              <h3>Load</h3>
-              <p>Plugins load sequentially in declaration order. Your shell is ready. Commit <code>zert.lock</code> for reproducibility.</p>
+              <h3>Загрузка</h3>
+              <p>Плагины загружаются последовательно в порядке объявления. Ваш shell готов. Закоммитьте <code>zert.lock</code> для воспроизводимости.</p>
             </div>
           </div>
         </div>
@@ -239,16 +238,16 @@ zert zsh-users/zsh-syntax-highlighting' aria-label="Copy code">
     <section class="usage" id="usage">
       <div class="container">
         <div class="section-header reveal">
-          <span class="section-tag">Usage</span>
-          <h2>Simple syntax. Powerful features.</h2>
-          <p>Everything is configured inline in your <code>.zshrc</code>.</p>
+          <span class="section-tag">Использование</span>
+          <h2>Простой синтаксис. Мощные возможности.</h2>
+          <p>Всё настраивается прямо в вашем <code>.zshrc</code>.</p>
         </div>
         <div class="usage-tabs reveal">
           <div class="tab-buttons">
-            <button class="tab-btn active" data-tab="declare">Declare</button>
-            <button class="tab-btn" data-tab="flags">Flags</button>
-            <button class="tab-btn" data-tab="commands">Commands</button>
-            <button class="tab-btn" data-tab="lockfile">Lockfile</button>
+            <button class="tab-btn active" data-tab="declare">Объявление</button>
+            <button class="tab-btn" data-tab="flags">Флаги</button>
+            <button class="tab-btn" data-tab="commands">Команды</button>
+            <button class="tab-btn" data-tab="lockfile">Lock-файл</button>
           </div>
           <div class="tab-panels">
             <div class="tab-panel active" id="tab-declare">
@@ -263,73 +262,73 @@ zert prezto modules/utility          # Prezto module
 zert zsh-users/zsh-autosuggestions   # GitHub shorthand
 zert https://github.com/user/repo    # full URL
 zert user/repo --branch dev          # track a branch
-zert /home/me/my-plugin              # local plugin" aria-label="Copy code">
+zert /home/me/my-plugin              # local plugin" aria-label="Скопировать код">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                   </button>
                 </div>
-                <pre><code><span class="code-comment"># Self-management</span>
-<span class="code-cmd">zert</span> zert  <span class="code-comment"># zert manages itself</span>
+                <pre><code><span class="code-comment"># Самоуправление</span>
+<span class="code-cmd">zert</span> zert  <span class="code-comment"># zert управляет собой</span>
 
-<span class="code-comment"># Oh-My-Zsh / Prezto compatibility</span>
+<span class="code-comment"># Совместимость с Oh-My-Zsh / Prezto</span>
 <span class="code-cmd">zert</span> use ohmyzsh
 <span class="code-cmd">zert</span> ohmyzsh lib/clipboard
 <span class="code-cmd">zert</span> use prezto
 <span class="code-cmd">zert</span> prezto modules/utility
 
-<span class="code-comment"># GitHub shorthand</span>
+<span class="code-comment"># Сокращение GitHub</span>
 <span class="code-cmd">zert</span> zsh-users/zsh-autosuggestions
 
-<span class="code-comment"># Full URL</span>
+<span class="code-comment"># Полный URL</span>
 <span class="code-cmd">zert</span> https://github.com/user/repo
 
-<span class="code-comment"># Track a branch</span>
+<span class="code-comment"># Отслеживание ветки</span>
 <span class="code-cmd">zert</span> user/repo <span class="code-flag">--branch</span> dev
 
-<span class="code-comment"># Local plugin</span>
+<span class="code-comment"># Локальный плагин</span>
 <span class="code-cmd">zert</span> /home/me/my-plugin</code></pre>
               </div>
             </div>
             <div class="tab-panel" id="tab-flags">
               <div class="code-block">
                 <div class="code-header">
-                  <span>Plugin Flags</span>
+                  <span>Флаги плагинов</span>
                   <button class="copy-btn" data-copy="zert user/plugin --pin abc123        # pin to commit
 zert user/plugin --branch dev         # track branch
 zert user/plugin --no-alias           # skip aliases
 zert user/plugin --no-completion      # skip completions
-zert user/plugin --only-completion    # completions only" aria-label="Copy code">
+zert user/plugin --only-completion    # completions only" aria-label="Скопировать код">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                   </button>
                 </div>
-                <pre><code><span class="code-comment"># Pin to specific commit</span>
+                <pre><code><span class="code-comment"># Зафиксировать на определённом коммите</span>
 <span class="code-cmd">zert</span> user/plugin <span class="code-flag">--pin</span> abc123def
 
-<span class="code-comment"># Track a branch instead of default</span>
+<span class="code-comment"># Отслеживать ветку вместо ветки по умолчанию</span>
 <span class="code-cmd">zert</span> user/plugin <span class="code-flag">--branch</span> dev
 
-<span class="code-comment"># Skip alias loading</span>
+<span class="code-comment"># Пропустить загрузку алиасов</span>
 <span class="code-cmd">zert</span> user/plugin <span class="code-flag">--no-alias</span>
 
-<span class="code-comment"># Skip completion loading</span>
+<span class="code-comment"># Пропустить загрузку автодополнений</span>
 <span class="code-cmd">zert</span> user/plugin <span class="code-flag">--no-completion</span>
 
-<span class="code-comment"># Load only completions</span>
+<span class="code-comment"># Загрузить только автодополнения</span>
 <span class="code-cmd">zert</span> user/plugin <span class="code-flag">--only-completion</span></code></pre>
               </div>
             </div>
             <div class="tab-panel" id="tab-commands">
               <div class="code-block">
                 <div class="code-header">
-                  <span>Subcommands</span>
+                  <span>Подкоманды</span>
                   <button class="copy-btn" data-copy="zert list      # show installed plugins
 zert update    # update all plugins
-zert prune     # remove unused plugins" aria-label="Copy code">
+zert prune     # remove unused plugins" aria-label="Скопировать код">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                   </button>
                 </div>
-                <pre><code><span class="code-cmd">zert</span> list     <span class="code-comment"># show installed plugins</span>
-<span class="code-cmd">zert</span> update   <span class="code-comment"># update all plugins</span>
-<span class="code-cmd">zert</span> prune    <span class="code-comment"># remove unused plugins</span></code></pre>
+                <pre><code><span class="code-cmd">zert</span> list     <span class="code-comment"># показать установленные плагины</span>
+<span class="code-cmd">zert</span> update   <span class="code-comment"># обновить все плагины</span>
+<span class="code-cmd">zert</span> prune    <span class="code-comment"># удалить неиспользуемые плагины</span></code></pre>
               </div>
             </div>
             <div class="tab-panel" id="tab-lockfile">
@@ -342,12 +341,12 @@ version::1
 zert::git::https://github.com/oxcl/zert::a1b2c3d4e5f6::
 zsh-autosuggestions::git::https://github.com/zsh-users/zsh-autosuggestions::f7g8h9i0j1k2::
 clipboard::ohmyzsh::https://github.com/ohmyzsh/ohmyzsh::l3m4n5o6p7q8::
-my-plugin::local::::r9s0t1u2v3w4::" aria-label="Copy code">
+my-plugin::local::::r9s0t1u2v3w4::" aria-label="Скопировать код">
                     <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1"/></svg>
                   </button>
                 </div>
-                <pre><code><span class="code-comment"># AUTO-GENERATED FILE. DO NOT EDIT MANUALLY.</span>
-<span class="code-comment"># Commit this file to version control for reproducible installs.</span>
+                <pre><code><span class="code-comment"># АВТОМАТИЧЕСКИ СГЕНЕРИРОВАННЫЙ ФАЙЛ. НЕ РЕДАКТИРУЙТЕ ВРУЧНУЮ.</span>
+<span class="code-comment"># Закоммитьте этот файл в систему контроля версий для воспроизводимых установок.</span>
 version::1
 zert::git::https://github.com/oxcl/zert::<span class="code-sha">a1b2c3d</span>::
 zsh-autosuggestions::git::https://github.com/zsh-users/zsh-autosuggestions::<span class="code-sha">f7g8h9i</span>::
@@ -366,17 +365,17 @@ my-plugin::local::::<span class="code-sha">r9s0t1u</span>::</code></pre>
       <div class="footer-inner">
         <div class="footer-left">
           <span class="footer-logo">zert</span>
-          <p>The plugin manager your .zshrc has been waiting for.</p>
+          <p>Менеджер плагинов, который ждал ваш .zshrc.</p>
         </div>
         <div class="footer-right">
           <a href="https://github.com/oxcl/zert" target="_blank" rel="noopener">GitHub</a>
-          <a href="https://github.com/oxcl/zert/blob/main/LICENSE" target="_blank" rel="noopener">GPLv3 License</a>
+          <a href="https://github.com/oxcl/zert/blob/main/LICENSE" target="_blank" rel="noopener">Лицензия GPLv3</a>
         </div>
       </div>
     </div>
   </footer>
 
-  <div class="toast" id="toast">Copied to clipboard</div>
+  <div class="toast" id="toast">Скопировано в буфер обмена</div>
   <script src="script.js"></script>
 </body>
 </html>

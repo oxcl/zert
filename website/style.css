@@ -147,6 +147,86 @@ code {
   color: var(--text);
 }
 
+.nav-lang {
+  position: relative;
+}
+
+.nav-lang-btn {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  background: none;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  color: var(--text-muted);
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.nav-lang-btn:hover {
+  color: var(--text);
+  border-color: var(--border-hover);
+  background: var(--bg-surface);
+}
+
+.nav-lang-btn svg {
+  transition: transform var(--transition);
+}
+
+.nav-lang.open .nav-lang-btn svg {
+  transform: rotate(180deg);
+}
+
+.nav-lang-dropdown {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  min-width: 160px;
+  background: var(--bg-surface);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  padding: 4px;
+  opacity: 0;
+  visibility: hidden;
+  transform: translateY(-8px);
+  transition: var(--transition);
+  z-index: 110;
+}
+
+.nav-lang.open .nav-lang-dropdown {
+  opacity: 1;
+  visibility: visible;
+  transform: translateY(0);
+}
+
+.nav-lang-option {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: var(--text-muted);
+  font-size: 0.85rem;
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  text-decoration: none;
+}
+
+.nav-lang-option:hover {
+  color: var(--text);
+  background: var(--bg-surface-hover);
+}
+
+.nav-lang-option.active {
+  color: var(--accent);
+  background: var(--accent-glow);
+}
+
 .nav-github {
   display: flex;
   align-items: center;
@@ -942,6 +1022,33 @@ code {
 
   .nav-github:hover {
     background: none;
+  }
+
+  .nav-lang {
+    position: static;
+  }
+
+  .nav-lang-btn {
+    width: 100%;
+    justify-content: center;
+    border: none;
+    padding: 12px 0;
+    border-radius: 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .nav-lang-dropdown {
+    position: static;
+    opacity: 1;
+    visibility: visible;
+    transform: none;
+    border: none;
+    background: transparent;
+    padding: 0 0 0 16px;
+  }
+
+  .nav-lang.open .nav-lang-dropdown {
+    display: block;
   }
 
   .features-grid {
