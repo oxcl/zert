@@ -45,7 +45,7 @@ else
 fi
 
 # Clone zert repository (shallow, single-branch for minimal bandwidth, silent unless error)
-if ! git clone --quiet --filter=tree:0 --single-branch --branch main --depth 1 https://github.com/oxcl/zert.git "$TMPDIR_ZERT/zert" 2>&1; then
+if ! git clone --quiet --single-branch --branch main --depth 1 https://github.com/oxcl/zert.git "$TMPDIR_ZERT/zert" 2>&1; then
     printf '[zert] Failed to clone zert repository.\n' >&2
     exit 1
 fi
