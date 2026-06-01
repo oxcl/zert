@@ -16,19 +16,18 @@
 
 ---
 
-Zert is a **pure-Zsh plugin manager** built around a simple idea: your plugins should be declared directly in your `.zshrc`, pinned to exact commits, and reproducible on any machine — just like npm does for Node projects.
+Zert is a **pure-Zsh plugin manager** built around a simple idea: your plugins should be declared directly in your `.zshrc`, pinned to exact commits, and reproducible on any machine just like npm does for Node projects.
 
-No config files to maintain. No subcommands to memorize for adding plugins. No external tools. Just Zsh, `git`, and `curl`.
+No config files to maintain. No subcommands to memorize No external tools. Just Zsh, `git`, and `curl`.
 
 ---
 
 ## ✨ Features
 
-- **Inline, declarative syntax** — declare plugins directly in `.zshrc`. No separate config file, no `add` command.
+- **Inline, declarative syntax** — declare plugins directly in `.zshrc`. No separate config file.
 - **Lockfile-based reproducibility** — `zert.lock` pins every plugin to an exact git commit SHA. Commit it. Share it. Reproduce it anywhere.
-- **Parallel installs** — clones multiple plugins simultaneously using `git clone --filter=tree:0` for minimal bandwidth.
-- **Sequential, ordered loading** — plugins are sourced in exactly the order you declare them. Always.
-- **Zero external UI dependencies** — real-time progress bars and spinners built entirely from ANSI escape codes.
+- **Parallel installs** — clones multiple plugins simultaneously using git treeless clonesfor minimal bandwidth.
+- **Zero external UI dependencies** — beautiful UI built entirely from ANSI escape codes.
 - **Self-managing** — Zert updates itself with `zert update zert`, managed as a first-class plugin.
 - **Oh-My-Zsh / Prezto compatibility** — load OMZ libs and Prezto modules without installing either framework.
 

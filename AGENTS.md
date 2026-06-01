@@ -113,7 +113,7 @@ version::1
 ```
 
 - Delimiter is `::`. Literal `::` inside a field must be escaped as `\::`.
-- Fields: `plugin_id`, `source` (`git`/`local`/`ohmyzsh`/`prezto`), `url`, `commit_sha`, `options`.
+- Fields: `plugin_id`, `source` (`git`/`local`/`ohmyzsh`/`prezto`/`zert`), `url`, `commit_sha`, `options`.
 - `options` is a comma-separated `key=value` list. No spaces around `=` or `,`.
 - Local plugins: `source=local`, `url` and `commit_sha` are empty strings (not omitted — fields are always present).
 
@@ -125,6 +125,7 @@ version::1
 | `local` | `/absolute/path/to/plugin` | Local directory |
 | `ohmyzsh` | `use ohmyzsh/lib/clipboard` | Subdirectory of Oh-My-Zsh repo |
 | `prezto` | `use prezto/modules/utility` | Subdirectory of Prezto repo |
+| `zert` | zert's own repo URL | Zert self-management (similar to ohmyzsh/prezto) |
 
 - Local plugins must be **absolute paths**. Reject relative paths with a clear error.
 - `ohmyzsh` and `prezto` source types clone the parent repo once and are shared.
