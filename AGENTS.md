@@ -135,8 +135,7 @@ version::1
 ## 6. Config Priority (High → Low)
 
 1. `ZERT_*` environment variables (e.g., `ZERT_DIR`, `ZERT_LOCKFILE`)
-2. `zstyle` settings (e.g., `zstyle ':zert:*' plugins-dir /custom/path`)
-3. Hardcoded defaults
+2. Hardcoded defaults
 
 Resolution logic must always follow this order. Never read a lower-priority source when a higher one is set.
 
@@ -155,7 +154,7 @@ Resolution logic must always follow this order. Never read a lower-priority sour
 ## 8. What Agents Must Not Do
 
 - ❌ Add any `npm`, `pip`, `brew`, or package manager dependency
-- ❌ Introduce a config file (TOML, YAML, JSON, INI) — config is env vars + zstyle only
+- ❌ Introduce a config file (TOML, YAML, JSON, INI) — config is env vars only
 - ❌ Write to any file outside `$ZERT_DIR` (except the lockfile at `$ZERT_LOCKFILE`)
 - ❌ Add a `doctor`/`diagnose` subcommand — dependency checks happen silently on load
 - ❌ Use `source` with a path that isn't validated to exist first
