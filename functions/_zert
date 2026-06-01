@@ -1,0 +1,43 @@
+#compdef zert
+
+_zert() {
+  local -a subcommands
+  subcommands=(
+    list:'List all loaded plugins'
+    update:'Pull latest commits for unpinned plugins'
+    prune:'Remove plugins no longer declared in config'
+    use:'Initialize a framework compatibility layer'
+    ohmyzsh:'Load an Oh-My-Zsh component'
+    prezto:'Load a Prezto module'
+    help:'Show help message'
+  )
+
+  _arguments -C \
+    '1: :->subcommand' \
+    '*: :->args' && return 0
+
+  case $state in
+    subcommand)
+      _describe 'zert subcommand' subcommands
+      ;;
+    args)
+      case $words[1] in
+        use)
+          _values 'framework' ohmyzsh prezto
+          ;;
+        ohmyzsh)
+          _values 'component' \
+            'plugins/[plugin]' \
+            'lib/[library]' \
+            'themes/[theme]'
+          ;;
+        prezto)
+          _values 'module' \
+            'modules/[module]'
+          ;;
+      esac
+      ;;
+  esac
+}
+
+_zert "$@"

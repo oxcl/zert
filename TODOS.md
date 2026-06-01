@@ -1,3 +1,4 @@
 - [ ] make update command take a subcommand to specify the plugin to update
 - [ ] fix the bug with Ctrl+C on update breaks the ui
 - [ ] fix the bug with Ctrl+C on fast-track breaks the ui
+- [ ] research and investigate zsh completions and how it should work with zert

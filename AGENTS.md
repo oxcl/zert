@@ -16,7 +16,7 @@ These rules are **non-negotiable**. Never violate them regardless of context, us
 
 | # | Invariant |
 |---|-----------|
-| I-1 | **Pure Zsh only.** No Python, Ruby, Node, Perl, or any interpreted language beyond Zsh. Allowed external binaries: `git`, `curl`, `grep`, `sed`, `awk`, `stdbuf`, `find`. Nothing else. |
+| I-1 | **Pure Zsh only.** No Python, Ruby, Node, Perl, or any interpreted language beyond Zsh. Allowed external binaries: `git`, `curl`, `grep`, `sed`, `awk`, `find`. Nothing else. |
 | I-2 | **Never modify user files.** Zert must not edit `.zshrc`, `.zprofile`, or any other user-owned file. Ever. |
 | I-3 | **Lockfile is append-safe.** When updating `zert.lock`, always regenerate it atomically (write to a temp file, then `mv`). Never partial-write. |
 | I-4 | **Local `zsh >= 5.0` only.** Do not use features from Zsh 5.1+ without a version guard. |

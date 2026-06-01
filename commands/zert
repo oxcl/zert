@@ -3,9 +3,15 @@
 zert() {
   local cmd="$1"
 
+  # Handle flags before dispatch
+  case "$cmd" in
+    --help|-h)    _zert_cmd_help; return ;;
+    --version|-v) print "zert $ZERT_VERSION"; return ;;
+  esac
+
   if [[ -z "$cmd" ]]; then
-    _zert_ui_error "Usage: zert <command> [args...]"
-    return 1
+    _zert_cmd_help
+    return 0
   fi
 
   shift

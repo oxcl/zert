@@ -21,12 +21,6 @@ _zert_check_deps() {
     missing=1
   fi
 
-  # Check for stdbuf
-  if ! command -v stdbuf >/dev/null 2>&1; then
-    _zert_ui_error "stdbuf is required but not found"
-    missing=1
-  fi
-
   # Check for find
   if ! command -v find >/dev/null 2>&1; then
     _zert_ui_error "find is required but not found"

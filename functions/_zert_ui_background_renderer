@@ -23,7 +23,10 @@ _zert_ui_background_renderer(){
                     log_ring=()
                     ;;
                 log_line)
-                    local decoded="$(printf '%s' "$value" | base64 --decode)"
+                    local decoded="$value"
+                    decoded="${decoded//\\=/=}"
+                    decoded="${decoded//\\n/$'\n'}"
+                    decoded="${decoded//\\\\/\\}"
                     log_ring+=("$decoded")
                     (( ${#log_ring[@]} > log_max )) && log_ring=("${log_ring[@]: -$log_max}")
                     ;;
