@@ -34,7 +34,7 @@ function initHeroAnimations() {
   elements.forEach((el, i) => {
     setTimeout(() => {
       el.classList.add('animate');
-    }, 200 + i * 150);
+    }, 100 + i * 100);
   });
 }
 
@@ -127,11 +127,11 @@ function initScrollReveal() {
     });
   }, {
     threshold: 0.1,
-    rootMargin: '0px 0px -50px 0px',
+    rootMargin: '0px 0px -20px 0px',
   });
 
   reveals.forEach((el, i) => {
-    el.dataset.delay = i * 80;
+    el.dataset.delay = i * 50;
     observer.observe(el);
   });
 }
