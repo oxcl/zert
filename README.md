@@ -2,6 +2,8 @@
 
 ![Zert logo](./logo.png)
 
+**[中文](./README_zh.md) | [Русский](./README_ru.md) | [Español](./README_es.md) | [Português](./README_pt.md)**
+
 # ⚡ Zert
 
 ### The plugin manager your `.zshrc` has been waiting for.
