@@ -3,7 +3,7 @@
 # This script is POSIX sh compatible (no zsh dependencies)
 #
 # Add this to your .zshrc:
-# ZERT_PLUGINS_DIR="${ZERT_PLUGINS_DIR:-${ZERT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/zert}/plugins}"; \
+# export ZERT_PLUGINS_DIR="${ZERT_PLUGINS_DIR:-${ZERT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/zert}/plugins}"; \
 # [[ -f "$ZERT_PLUGINS_DIR/zert/zert.zsh" ]] || \
 # (curl -fsSL https://raw.githubusercontent.com/oxcl/zert/main/bootstrap.sh | zsh); \
 # source "$ZERT_PLUGINS_DIR/zert/zert.zsh"
@@ -19,7 +19,7 @@ command -v git >/dev/null 2>&1 || {
 }
 
 # Determine ZERT_PLUGINS_DIR with XDG defaults
-ZERT_PLUGINS_DIR="${ZERT_PLUGINS_DIR:-${ZERT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/zert}/plugins}"
+export ZERT_PLUGINS_DIR="${ZERT_PLUGINS_DIR:-${ZERT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/zert}/plugins}"
 
 # If already cloned (marker files exist), we're done (idempotent)
 if [ -f "$ZERT_PLUGINS_DIR/zert/zert.zsh" ] && [ -f "$ZERT_PLUGINS_DIR/zert/zert.plugin.zsh" ]; then

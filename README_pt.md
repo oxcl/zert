@@ -38,7 +38,7 @@ Sem arquivos de configuração para manter. Sem subcomandos para memorizar. Sem 
 Cole isto no topo do seu `.zshrc`:
 
 ```zsh
-ZERT_PLUGINS_DIR="${ZERT_PLUGINS_DIR:-${ZERT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/zert}/plugins}"; \
+export ZERT_PLUGINS_DIR="${ZERT_PLUGINS_DIR:-${ZERT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/zert}/plugins}"; \
 [[ -f "$ZERT_PLUGINS_DIR/zert/zert.zsh" ]] || \
 (curl -fsSL https://raw.githubusercontent.com/oxcl/zert/main/bootstrap.sh | zsh); \
 source "$ZERT_PLUGINS_DIR/zert/zert.zsh"

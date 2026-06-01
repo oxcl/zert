@@ -40,7 +40,7 @@ No config files to maintain. No subcommands to memorize No external tools. Just 
 Paste this at the top of your `.zshrc`:
 
 ```zsh
-ZERT_PLUGINS_DIR="${ZERT_PLUGINS_DIR:-${ZERT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/zert}/plugins}"; \
+export ZERT_PLUGINS_DIR="${ZERT_PLUGINS_DIR:-${ZERT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/zert}/plugins}"; \
 [[ -f "$ZERT_PLUGINS_DIR/zert/zert.zsh" ]] || \
 (curl -fsSL https://raw.githubusercontent.com/oxcl/zert/main/bootstrap.sh | zsh); \
 source "$ZERT_PLUGINS_DIR/zert/zert.zsh"

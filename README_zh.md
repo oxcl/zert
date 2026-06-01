@@ -38,7 +38,7 @@ Zert 是一个**纯 Zsh 插件管理器**，围绕一个简单的理念构建：
 将以下内容粘贴到 `.zshrc` 的顶部：
 
 ```zsh
-ZERT_PLUGINS_DIR="${ZERT_PLUGINS_DIR:-${ZERT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/zert}/plugins}"; \
+export ZERT_PLUGINS_DIR="${ZERT_PLUGINS_DIR:-${ZERT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/zert}/plugins}"; \
 [[ -f "$ZERT_PLUGINS_DIR/zert/zert.zsh" ]] || \
 (curl -fsSL https://raw.githubusercontent.com/oxcl/zert/main/bootstrap.sh | zsh); \
 source "$ZERT_PLUGINS_DIR/zert/zert.zsh"

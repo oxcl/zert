@@ -112,7 +112,7 @@
                 <span></span><span></span><span></span>
               </div>
               <span>~/.zshrc</span>
-              <button class="copy-btn" data-copy='ZERT_PLUGINS_DIR="${ZERT_PLUGINS_DIR:-${ZERT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/zert}/plugins}"; \
+              <button class="copy-btn" data-copy='export ZERT_PLUGINS_DIR="${ZERT_PLUGINS_DIR:-${ZERT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/zert}/plugins}"; \
 [[ -f "$ZERT_PLUGINS_DIR/zert/zert.zsh" ]] || \
 (curl -fsSL https://raw.githubusercontent.com/oxcl/zert/main/bootstrap.sh | zsh); \
 source "$ZERT_PLUGINS_DIR/zert/zert.zsh"
@@ -124,7 +124,7 @@ zert zsh-users/zsh-syntax-highlighting' aria-label="Copy code">
               </button>
             </div>
             <pre class="bootstrap-pre"><code><span class="code-comment"># bootstrap zert — runs once, self-clones on first launch</span>
-<span class="code-var">ZERT_PLUGINS_DIR</span>=<span class="code-string">"${ZERT_PLUGINS_DIR:-${ZERT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/zert}/plugins}"</span>
+<span class="code-kw">export</span> <span class="code-var">ZERT_PLUGINS_DIR</span>=<span class="code-string">"${ZERT_PLUGINS_DIR:-${ZERT_DIR:-${XDG_DATA_HOME:-$HOME/.local/share}/zert}/plugins}"</span>
 <span class="code-kw">[[</span> <span class="code-flag">-f</span> <span class="code-string">"$ZERT_PLUGINS_DIR/zert/zert.zsh"</span> <span class="code-kw">]]</span> <span class="code-operator">||</span> \
   <span class="code-kw">(</span><span class="code-cmd">curl</span> <span class="code-flag">-fsSL</span> https://raw.githubusercontent.com/oxcl/zert/main/bootstrap.sh <span class="code-operator">|</span> <span class="code-cmd">zsh</span><span class="code-kw">)</span>
 <span class="code-cmd">source</span> <span class="code-string">"$ZERT_PLUGINS_DIR/zert/zert.zsh"</span>
