@@ -53,6 +53,7 @@ _zert_plugin_add() {
   if ! $plugin_exists; then
     _zert_ui_subtask_start $subtask_idx "Cloning repository"
     _zert_plugin_clone "$plugin_id" "$source_type" "$source_value" "$@" 2>&1 | _zert_ui_subtask_log 4
+    # pipestatus[1] = exit code of the left side of the pipe (the command, not the log consumer)
     if [[ ${pipestatus[1]} -ne 0 ]]; then
       _zert_ui_subtask_update $subtask_idx "Clone failed!"
       _zert_ui_subtask_end $subtask_idx "fail"

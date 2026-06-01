@@ -67,6 +67,7 @@ _zert_cmd_update() {
     fi
 
     _zert_plugin_update "$plugin_id" "$source_type" "$source_value" "$plugin_dir" "${update_flags[@]}" 2>&1 | _zert_ui_subtask_log 4
+    # pipestatus[1] = exit code of the left side of the pipe (the command, not the log consumer)
     if [[ ${pipestatus[1]} -ne 0 ]]; then
       _zert_ui_subtask_update $subtask_idx "Pull failed!"
       _zert_ui_subtask_end $subtask_idx "fail"
