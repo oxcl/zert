@@ -162,6 +162,10 @@ export ZERT_LOCKFILE="$HOME/.zert.lock"     # Change the lockfile path
 If Zert is useful to you, consider giving the repo a star on [GitHub](https://github.com/oxcl/zert) or making a [donation](https://oxcl.github.io/zert/#donate).
 
 
+## 🔄 Comparison
+
+The Zsh plugin manager ecosystem is large — Antidote, Zinit, Sheldon, Zgenom, Zim, and others all take different approaches to the same problem. Most are fast enough that performance differences are negligible. The meaningful distinctions come down to config style, reproducibility, and dependency model. Zert is the only pure-Zsh manager with both inline declarations and a lockfile for reproducible installs. For a full breakdown, see the [comparison](./COMPARISON.md).
+
 ## 📄 License
 
 GNU General Public License v3.0 — see [`LICENSE`](./LICENSE) for details.

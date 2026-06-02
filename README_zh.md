@@ -160,6 +160,10 @@ export ZERT_LOCKFILE="$HOME/.zert.lock"     # 更改锁文件路径
 如果 Zert 对你有用，请考虑在 [GitHub](https://github.com/oxcl/zert) 上给个星或进行[捐赠](https://oxcl.github.io/zert/#donate)。
 
 
+## 🔄 对比
+
+Zsh 插件管理器生态系统很大——Antidote、Zinit、Sheldon、Zgenom、Zim 等都采用不同的方式解决同一问题。大多数的速度快到性能差异可以忽略不计。真正的区别在于配置风格、可复现性和依赖模型。Zert 是唯一同时具有内联声明和锁文件以实现可复现安装的纯 Zsh 管理器。完整的详细对比请参见[对比文档](./COMPARISON_zh.md)。
+
 ## 📄 许可证
 
 GNU 通用公共许可证 v3.0 — 详见 [`LICENSE`](./LICENSE)。

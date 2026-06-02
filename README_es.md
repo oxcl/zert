@@ -160,6 +160,10 @@ Inicio de .zshrc
 Si Zert te es útil, considera darle una estrella en [GitHub](https://github.com/oxcl/zert) o hacer una [donación](https://oxcl.github.io/zert/#donate).
 
 
+## 🔄 Comparación
+
+El ecosistema de gestores de plugins Zsh es grande — Antidote, Zinit, Sheldon, Zgenom, Zim y otros adoptan diferentes enfoques para el mismo problema. La mayoría son lo suficientemente rápidos como para que las diferencias de rendimiento sean insignificantes. Las distinciones significativas se reducen al estilo de configuración, reproducibilidad y modelo de dependencias. Zert es el único gestor puro en Zsh con declaraciones inline y un lockfile para instalaciones reproducibles. Para un análisis completo, consulta la [comparación](./COMPARISON_es.md).
+
 ## 📄 Licencia
 
 GNU General Public License v3.0 — ver [`LICENSE`](./LICENSE) para detalles.
