@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Zsh Plugin Manager Comparison — Zert</title>
+  <meta name="description" content="A factual comparison of Zert with the most widely used Zsh plugin managers: Antidote, Sheldon, Zinit, Zgenom, Zim, and more.">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>⚡</text></svg>">
+  <meta name="theme-color" content="#282828">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <nav class="nav" id="nav">
+    <div class="nav-inner">
+      <a href="index.html" class="nav-logo">
+        <img src="logo.png" alt="Zert" class="nav-logo-img">
+        <span class="nav-logo-text">zert</span>
+      </a>
+      <button class="nav-toggle" id="navToggle" aria-label="Toggle menu">
+        <span></span><span></span><span></span>
+      </button>
+      <ul class="nav-links" id="navLinks">
+        <li><a href="index.html">Home</a></li>
+        <li><a href="index.html#features">Features</a></li>
+        <li><a href="comparison.html" style="color: var(--text);">Comparison</a></li>
+        <li>
+          <div class="nav-lang" id="navLang">
+            <button class="nav-lang-btn" id="navLangBtn" aria-label="Select language">
+              🌐 EN
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9l6 6 6-6"/></svg>
+            </button>
+            <div class="nav-lang-dropdown" id="navLangDropdown">
+              <a href="index.html" class="nav-lang-option active">🇺🇸 English</a>
+              <a href="zh.html" class="nav-lang-option">🇨🇳 中文</a>
+              <a href="ru.html" class="nav-lang-option">🇷🇺 Русский</a>
+              <a href="es.html" class="nav-lang-option">🇪🇸 Español</a>
+              <a href="pt.html" class="nav-lang-option">🇧🇷 Português</a>
+            </div>
+          </div>
+        </li>
+        <li><a href="https://github.com/oxcl/zert" target="_blank" rel="noopener" class="nav-github">GitHub</a></li>
+      </ul>
+    </div>
+  </nav>
+
+  <main>
+    <section class="comparison-hero reveal">
+      <div class="container">
+        <span class="section-tag">Reference</span>
+        <h1>Zsh Plugin Manager Comparison</h1>
+        <p>A factual comparison of Zert with the most widely used Zsh plugin managers. Each entry describes how the manager works, how plugins are configured, and where its approach diverges from Zert's.</p>
+      </div>
+    </section>
+
+    <section class="comparison-section">
+      <div class="container">
+        <h2 class="reveal">Comparison Table</h2>
+        <div class="comparison-table-wrap reveal">
+          <table class="comparison-table">
+            <thead>
+              <tr>
+                <th>Feature</th>
+                <th>Zert</th>
+                <th>Antidote</th>
+                <th>Antibody</th>
+                <th>Antigen</th>
+                <th>Sheldon</th>
+                <th>Zap</th>
+                <th>Zgenom</th>
+                <th>Zim</th>
+                <th>Zinit</th>
+                <th>Zplug</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td>Written in</td>
+                <td>Zsh</td>
+                <td>Zsh</td>
+                <td>Go</td>
+                <td>Zsh</td>
+                <td>Rust</td>
+                <td>Zsh</td>
+                <td>Zsh</td>
+                <td>Zsh</td>
+                <td>Zsh</td>
+                <td>Zsh</td>
+              </tr>
+              <tr>
+                <td>Config style</td>
+                <td>Inline</td>
+                <td>Separate file</td>
+                <td>Separate file</td>
+                <td>Inline</td>
+                <td>TOML file</td>
+                <td>Inline</td>
+                <td>Inline</td>
+                <td>.zimrc file</td>
+                <td>Inline</td>
+                <td>Inline</td>
+              </tr>
+              <tr>
+                <td>Lockfile</td>
+                <td class="col-yes">Yes</td>
+                <td class="col-no">No</td>
+                <td class="col-no">No</td>
+                <td class="col-no">No</td>
+                <td class="col-no">No</td>
+                <td class="col-no">No</td>
+                <td class="col-no">No</td>
+                <td class="col-no">No</td>
+                <td class="col-no">No</td>
+                <td class="col-no">No</td>
+              </tr>
+              <tr>
+                <td>Parallel install</td>
+                <td class="col-yes">Yes</td>
+                <td class="col-yes">Yes</td>
+                <td class="col-yes">Yes</td>
+                <td class="col-no">No</td>
+                <td class="col-yes">Yes</td>
+                <td class="col-no">No</td>
+                <td class="col-no">No</td>
+                <td class="col-yes">Yes</td>
+                <td class="col-no">No</td>
+                <td class="col-yes">Yes</td>
+              </tr>
+              <tr>
+                <td>Loading strategy</td>
+                <td>Direct source</td>
+                <td>Static file</td>
+                <td>Static file</td>
+                <td>Static bundle</td>
+                <td>Static file</td>
+                <td>Direct source</td>
+                <td>Static file</td>
+                <td>Static file</td>
+                <td>Turbo (async)</td>
+                <td>Cache</td>
+              </tr>
+              <tr>
+                <td>Bytecode compile</td>
+                <td class="col-yes">Yes</td>
+                <td class="col-no">No</td>
+                <td class="col-no">No</td>
+                <td class="col-yes">Yes</td>
+                <td class="col-na">N/A</td>
+                <td class="col-no">No</td>
+                <td class="col-no">Optional</td>
+                <td class="col-yes">Yes</td>
+                <td class="col-yes">Yes</td>
+                <td class="col-no">No</td>
+              </tr>
+              <tr>
+                <td>OMZ support</td>
+                <td class="col-yes">Yes</td>
+                <td class="col-yes">Yes</td>
+                <td class="col-yes">Yes</td>
+                <td class="col-yes">Yes</td>
+                <td>Templates</td>
+                <td>Limited</td>
+                <td class="col-yes">Yes</td>
+                <td class="col-yes">Yes</td>
+                <td class="col-yes">Yes (snippet)</td>
+                <td class="col-yes">Yes</td>
+              </tr>
+              <tr>
+                <td>Prezto support</td>
+                <td class="col-yes">Yes</td>
+                <td class="col-yes">Yes</td>
+                <td class="col-no">No</td>
+                <td class="col-no">No</td>
+                <td>Templates</td>
+                <td class="col-no">No</td>
+                <td class="col-yes">Yes</td>
+                <td class="col-yes">Yes</td>
+                <td class="col-yes">Yes (snippet)</td>
+                <td class="col-yes">Yes</td>
+              </tr>
+              <tr>
+                <td>Self-managing</td>
+                <td class="col-yes">Yes</td>
+                <td class="col-no">No</td>
+                <td class="col-no">No</td>
+                <td class="col-no">No</td>
+                <td class="col-no">No</td>
+                <td class="col-no">No</td>
+                <td class="col-no">No</td>
+                <td class="col-no">No</td>
+                <td class="col-no">No</td>
+                <td class="col-no">No</td>
+              </tr>
+              <tr>
+                <td>Config files</td>
+                <td>None</td>
+                <td>plugins.txt</td>
+                <td>plugins.txt</td>
+                <td>None</td>
+                <td>plugins.toml</td>
+                <td>None</td>
+                <td>None</td>
+                <td>.zimrc</td>
+                <td>None</td>
+                <td>None</td>
+              </tr>
+              <tr>
+                <td>External binary</td>
+                <td>None</td>
+                <td>None</td>
+                <td>Go binary</td>
+                <td>None</td>
+                <td>Rust binary</td>
+                <td>None</td>
+                <td>None</td>
+                <td>None</td>
+                <td>None</td>
+                <td>None</td>
+              </tr>
+              <tr>
+                <td>Status</td>
+                <td><span class="status-badge status-badge--active">Active</span></td>
+                <td><span class="status-badge status-badge--active">Active</span></td>
+                <td><span class="status-badge status-badge--archived">Archived</span></td>
+                <td><span class="status-badge status-badge--unmaintained">Unmaintained</span></td>
+                <td><span class="status-badge status-badge--active">Active</span></td>
+                <td><span class="status-badge status-badge--active">Active</span></td>
+                <td><span class="status-badge status-badge--active">Active</span></td>
+                <td><span class="status-badge status-badge--active">Active</span></td>
+                <td><span class="status-badge status-badge--active">Active</span></td>
+                <td><span class="status-badge status-badge--abandoned">Abandoned</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </section>
+
+    <section class="comparison-section">
+      <div class="container">
+        <h2 class="reveal">Individual Managers</h2>
+
+        <!-- Antidote -->
+        <div class="manager-card reveal">
+          <div class="manager-header">
+            <h3>Antidote</h3>
+            <div class="manager-meta">
+              <a href="https://github.com/mattmc3/antidote" target="_blank" rel="noopener">GitHub</a>
+              <span class="status-badge status-badge--active">Active</span>
+            </div>
+          </div>
+          <p>Antidote is a pure-Zsh plugin manager created as the successor to Antibody. It reads plugins from a <code>~/.zsh_plugins.txt</code> file (one plugin per line), generates a static load script containing <code>source</code> statements, and your <code>.zshrc</code> sources that generated file. On subsequent shell starts, only the static file is sourced — no re-parsing of plugin declarations occurs. Install is parallel. Loading is effectively a single <code>source</code> call. Antidote supports Oh-My-Zsh and Prezto plugins natively using <code>owner/repo</code> shorthand notation.</p>
+          <div class="vs-zert">
+            <div class="vs-zert-label">vs Zert</div>
+            <p>Antidote uses a separate <code>plugins.txt</code> config file; Zert declares plugins inline in <code>.zshrc</code>. Antidote has no lockfile — plugins are not pinned to commit SHAs, so reproducibility across machines depends on whatever state each clone happens to be at. Zert writes a <code>zert.lock</code> that pins every plugin to an exact commit. Both are pure Zsh with parallel installs. Antidote's static-file approach means zero parsing overhead on load; Zert parses declarations each startup but optimizes with a fast path that skips UI/git ops when plugins are already synced.</p>
+          </div>
+        </div>
+
+        <!-- Antibody -->
+        <div class="manager-card reveal">
+          <div class="manager-header">
+            <h3>Antibody</h3>
+            <div class="manager-meta">
+              <a href="https://github.com/getantibody/antibody" target="_blank" rel="noopener">GitHub</a>
+              <span class="status-badge status-badge--archived">Archived</span>
+            </div>
+          </div>
+          <p>Antibody was a Go binary that managed Zsh plugins. It supported a <code>plugins.txt</code> file (similar to Antidote) and could generate a static loading file. It was the predecessor to Antidote — its author deprecated it after native-Zsh managers caught up on performance. Antibody's Go implementation handled parsing and file generation, but the actual plugin sourcing was done by Zsh's <code>source</code> command, meaning the Go binary only reduced config-parsing overhead, not plugin-loading overhead.</p>
+          <div class="vs-zert">
+            <div class="vs-zert-label">vs Zert</div>
+            <p>Antibody required a compiled Go binary; Zert is pure Zsh. Antibody had no lockfile or commit pinning. Antibody is archived and no longer maintained; Zert is actively developed. Both supported parallel installs and static loading. The key difference is the dependency model — Zert requires only <code>git</code> and <code>curl</code>, while Antibody required installing and updating a Go binary.</p>
+          </div>
+        </div>
+
+        <!-- Antigen -->
+        <div class="manager-card reveal">
+          <div class="manager-header">
+            <h3>Antigen</h3>
+            <div class="manager-meta">
+              <a href="https://github.com/zsh-users/antigen" target="_blank" rel="noopener">GitHub</a>
+              <span class="status-badge status-badge--unmaintained">Unmaintained</span>
+            </div>
+          </div>
+          <p>Antigen was one of the earliest Zsh plugin managers, inspired by Vim's Vundle/Pathogen. It introduced the <code>antigen bundle</code> command for declaring plugins inline and was the first to bring Oh-My-Zsh plugin compatibility to standalone plugin management. Later versions added static bundle loading and bytecode compilation. Antigen loads plugins by sourcing them sequentially. It has no parallel install capability. Clean startup time is around 60ms, which is slower than modern alternatives.</p>
+          <div class="vs-zert">
+            <div class="vs-zert-label">vs Zert</div>
+            <p>Both use inline declarations. Antigen has no lockfile, no parallel install, and no commit pinning. Antigen is unmaintained; Zert is active. Antigen's bytecode compilation predates Zert's, but Zert's parallel clone + treeless clone strategy makes installation significantly faster. Antigen only supports Oh-My-Zsh; Zert also supports Prezto.</p>
+          </div>
+        </div>
+
+        <!-- Sheldon -->
+        <div class="manager-card reveal">
+          <div class="manager-header">
+            <h3>Sheldon</h3>
+            <div class="manager-meta">
+              <a href="https://github.com/rossmacarthur/sheldon" target="_blank" rel="noopener">GitHub</a>
+              <span class="status-badge status-badge--active">Active</span>
+            </div>
+          </div>
+          <p>Sheldon is a shell plugin manager written in Rust. It uses a TOML configuration file (<code>plugins.toml</code>) and generates a static loading script. Because parsing and file generation happen in Rust, the Zsh startup overhead is minimal — the shell only sources the pre-generated file. Sheldon supports plugins from Git repositories (with branch/tag/commit pinning), GitHub Gists, remote scripts, local plugins, and inline plugins. It uses a template system for flexible install methods. It is shell-agnostic, working with both Bash and Zsh.</p>
+          <div class="vs-zert">
+            <div class="vs-zert-label">vs Zert</div>
+            <p>Sheldon requires a Rust binary; Zert is pure Zsh. Sheldon uses a TOML config file; Zert uses inline declarations. Sheldon has no lockfile; Zert's <code>zert.lock</code> pins every plugin to an exact commit. Sheldon is shell-agnostic; Zert is Zsh-specific. Sheldon's template system is more configurable but adds complexity; Zert's approach is simpler with sensible defaults. Both support parallel installs.</p>
+          </div>
+        </div>
+
+        <!-- Zap -->
+        <div class="manager-card reveal">
+          <div class="manager-header">
+            <h3>Zap</h3>
+            <div class="manager-meta">
+              <a href="https://github.com/zap-zsh/zap" target="_blank" rel="noopener">GitHub</a>
+              <span class="status-badge status-badge--active">Active</span>
+            </div>
+          </div>
+          <p>Zap is a minimal Zsh plugin manager. Plugins are declared inline using <code>plug</code> commands in <code>.zshrc</code>. It clones plugins on first load and sources them directly — no static file generation, no bytecode compilation, no caching. The entire codebase is small. Zap provides <code>zap update</code>, <code>zap list</code>, and <code>zap clean</code> subcommands. It supports local plugins and custom URL prefixes for private repositories. It has no Oh-My-Zsh or Prezto integration.</p>
+          <div class="vs-zert">
+            <div class="vs-zert-label">vs Zert</div>
+            <p>Both use inline declarations and are pure Zsh. Zap is the closest in philosophy to Zert — minimal, inline, no config files. However, Zap has no lockfile, no parallel installs, no bytecode compilation, and limited framework compatibility. Zert adds reproducibility (lockfile), performance (parallel + compile), and OMZ/Prezto support on top of the same inline model. Zap is simpler; Zert is more capable.</p>
+          </div>
+        </div>
+
+        <!-- Zgenom -->
+        <div class="manager-card reveal">
+          <div class="manager-header">
+            <h3>Zgenom</h3>
+            <div class="manager-meta">
+              <a href="https://github.com/jandamm/zgenom" target="_blank" rel="noopener">GitHub</a>
+              <span class="status-badge status-badge--active">Active</span>
+            </div>
+          </div>
+          <p>Zgenom is the maintained fork of zgen. It takes a "generate once, source many" approach: plugins are declared with <code>zgenom load</code> commands inside an <code>if ! zgenom saved; then ... zgenom save; fi</code> block. On first run, it clones plugins and generates a static init script. On subsequent runs, it sources that script directly. Zgenom supports Oh-My-Zsh and Prezto, auto-update on a configurable schedule, <code>--pin</code> for individual plugins, and <code>zgenom compile</code> for bytecode compilation.</p>
+          <div class="vs-zert">
+            <div class="vs-zert-label">vs Zert</div>
+            <p>Both are pure Zsh with inline declarations and OMZ/Prezto support. Zgenom requires a manual <code>zgenom reset</code> after changing plugin declarations to regenerate the init script; Zert detects changes automatically on each load. Zgenom's <code>--pin</code> exists for individual plugins but there is no global lockfile; Zert's <code>zert.lock</code> pins every plugin atomically. Zgenom's static file approach means zero parsing overhead on warm loads; Zert parses declarations each time but short-circuits when plugins are already synced. Zgenom has no parallel install; Zert clones in parallel.</p>
+          </div>
+        </div>
+
+        <!-- Zim -->
+        <div class="manager-card reveal">
+          <div class="manager-header">
+            <h3>Zim (zimfw)</h3>
+            <div class="manager-meta">
+              <a href="https://github.com/zimfw/zimfw" target="_blank" rel="noopener">GitHub</a>
+              <span class="status-badge status-badge--active">Active</span>
+            </div>
+          </div>
+          <p>Zim is a Zsh configuration framework that bundles a plugin manager with curated modules. It uses a separate <code>~/.zimrc</code> file with <code>zmodule</code> calls to define modules. It builds a static <code>init.zsh</code> script and aggressively compiles all Zsh files to bytecode. Warm load times are extremely fast — around 0.009s in benchmarks. Zim ships its own modules (environment, git, input, completion, etc.) alongside external plugins. It supports a <code>degit</code> tool (curl/wget-based) as an alternative to git for faster, lighter installs on GitHub repos.</p>
+          <div class="vs-zert">
+            <div class="vs-zert-label">vs Zert</div>
+            <p>Zim is a framework with a plugin manager; Zert is a standalone plugin manager. Zim uses a separate <code>.zimrc</code> config file; Zert uses inline declarations. Zim has no lockfile. Zim's aggressive bytecode compilation gives it the fastest warm load times in the ecosystem. Zert compiles too, but Zim's framework-level integration means it compiles its own infrastructure as well. Zim's <code>degit</code> option trades git history for faster downloads; Zert always uses git. Zim's curated module set is a pro (turnkey defaults) and a con (less flexible than cherry-picking from arbitrary repos).</p>
+          </div>
+        </div>
+
+        <!-- Zinit -->
+        <div class="manager-card reveal">
+          <div class="manager-header">
+            <h3>Zinit</h3>
+            <div class="manager-meta">
+              <a href="https://github.com/zdharma-continuum/zinit" target="_blank" rel="noopener">GitHub</a>
+              <span class="status-badge status-badge--active">Active</span>
+            </div>
+          </div>
+          <p>Zinit is the most feature-rich Zsh plugin manager. Its defining feature is "turbo mode" — plugins load asynchronously after the prompt appears, hiding load latency. It also provides bytecode compilation, plugin reports (showing what aliases, functions, and completions a plugin sets up), an annex system for extensibility, and services for background processes. Zinit uses <code>zinit light</code> for plugins and <code>zinit snippet</code> for loading individual files from Oh-My-Zsh or Prezto repos. It has a complex "ice modifier" system (<code>atload</code>, <code>wait</code>, <code>depth</code>, <code>lucid</code>, etc.) that controls how and when plugins load.</p>
+          <div class="vs-zert">
+            <div class="vs-zert-label">vs Zert</div>
+            <p>Zinit is the most complex manager; Zert is deliberately simple. Zinit has turbo mode (async loading); Zert loads everything synchronously before the prompt. Zinit has no lockfile; Zert's <code>zert.lock</code> pins every commit. Zinit's ice modifier system is powerful but has a steep learning curve; Zert's <code>--pin</code>, <code>--branch</code>, <code>--no-alias</code> flags cover common cases without complexity. Zinit is community-maintained after a turbulent history (original author deleted the project in 2021); Zert is actively developed. Both support OMZ/Prezto and bytecode compilation. Zinit solves perceived latency; Zert solves reproducibility.</p>
+          </div>
+        </div>
+
+        <!-- Zplug -->
+        <div class="manager-card reveal">
+          <div class="manager-header">
+            <h3>Zplug</h3>
+            <div class="manager-meta">
+              <a href="https://github.com/zplug/zplug" target="_blank" rel="noopener">GitHub</a>
+              <span class="status-badge status-badge--abandoned">Abandoned</span>
+            </div>
+          </div>
+          <p>Zplug was a feature-rich plugin manager that supported parallel installation, lazy loading, dependency management between plugins, branch/tag/commit pinning, and post-update hooks. It managed plugins from GitHub, Bitbucket, Oh-My-Zsh, Prezto, and local directories. Despite its feature set, Zplug had a poor implementation — clean startup time was around 160ms, significantly slower than alternatives. The project has been abandoned with no recent commits.</p>
+          <div class="vs-zert">
+            <div class="vs-zert-label">vs Zert</div>
+            <p>Both use inline declarations. Zplug had parallel install and caching but with poor performance; Zert achieves parallel installs with minimal overhead via treeless clones. Zplug has no lockfile; Zert's <code>zert.lock</code> provides reproducibility. Zplug is abandoned; Zert is active. Zplug's dependency management between plugins was a unique feature that Zert does not replicate. Zplug's lazy loading was conceptually similar to Zinit's turbo mode but less well-implemented.</p>
+          </div>
+        </div>
+
+        <!-- Zsh Unplugged / Zcomet -->
+        <div class="manager-card reveal">
+          <div class="manager-header">
+            <h3>Zsh Unplugged / Zcomet</h3>
+            <div class="manager-meta">
+              <a href="https://github.com/mattmc3/zsh_unplugged" target="_blank" rel="noopener">Unplugged</a>
+              <a href="https://github.com/menacel-mgmt/zcomet" target="_blank" rel="noopener">Zcomet</a>
+              <span class="status-badge status-badge--active">Active</span>
+            </div>
+          </div>
+          <p>Zsh Unplugged is not a plugin manager — it is a ~20-line <code>plugin-load</code> function that demonstrates how to manage Zsh plugins without any manager. It clones repos, finds the appropriate <code>.zsh</code> file, and sources it. The intent is to demystify what plugin managers do and show that for basic configs, a standalone tool is unnecessary. Zcomet is a minimal plugin manager from the same author that formalizes the unplugged approach. It achieves excellent benchmark scores (10% first-prompt lag, 44% first-command lag) with a tiny codebase.</p>
+          <div class="vs-zert">
+            <div class="vs-zert-label">vs Zert</div>
+            <p>Zsh Unplugged is an educational exercise; Zert is a production tool. The unplugged approach has no lockfile, no parallel install, no compilation, no framework compatibility, and no UI. Zcomet adds structure but remains minimal — no lockfile, no parallel install. Both philosophies reject complexity, but Zert adds reproducibility and performance tooling while keeping the same inline declaration model. If you want the simplest possible setup and are willing to manage versions manually, the unplugged approach works. If you want reproducibility without thinking about it, Zert fills that gap.</p>
+          </div>
+        </div>
+
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="container">
+      <div class="footer-inner">
+        <div class="footer-left">
+          <span class="footer-logo">zert</span>
+          <p>The plugin manager your .zshrc has been waiting for.</p>
+        </div>
+        <div class="footer-right">
+          <a href="https://github.com/oxcl/zert" target="_blank" rel="noopener">GitHub</a>
+          <a href="https://github.com/oxcl/zert/blob/main/LICENSE" target="_blank" rel="noopener">GPLv3 License</a>
+        </div>
+      </div>
+    </div>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
