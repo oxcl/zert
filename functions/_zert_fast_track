@@ -61,7 +61,7 @@ _zert_fast_track() {
       *)       [[ -d "$ZERT_PLUGINS_DIR/$plugin_id" ]] && continue ;;
     esac
 
-    _zert_ui_subtask_start $idx "Cloning ${plugin_id}..."
+    _zert_ui_subtask_start $idx "Cloning **${plugin_id}**..."
 
     # Reconstruct clone flags from the lockfile options string
     local -a flags
@@ -90,29 +90,29 @@ _zert_fast_track() {
       local log_file="${log_dir}/${plugin_id//\//_}_${idx}.log"
 
       if ! _zert_plugin_clone "$plugin_id" "$source_type" "$source_value" "${flags[@]}" 2>"$log_file" >/dev/null; then
-        _zert_ui_subtask_update $idx "${plugin_id} clone failed — log: $log_file"
+        _zert_ui_subtask_update $idx "**${plugin_id}** clone failed — log: $log_file"
         _zert_ui_subtask_end $idx "fail"
         return 1
       fi
 
       if [[ -n "$commit_sha" ]]; then
-        _zert_ui_subtask_update $idx "Checking out ${plugin_id}..."
+        _zert_ui_subtask_update $idx "Checking out **${plugin_id}**..."
         if ! git -C "$plugin_dir" checkout "$commit_sha" 2>>"$log_file" >/dev/null; then
-          _zert_ui_subtask_update $idx "${plugin_id} checkout failed — log: $log_file"
+          _zert_ui_subtask_update $idx "**${plugin_id}** checkout failed — log: $log_file"
           _zert_ui_subtask_end $idx "fail"
           return 1
         fi
       fi
 
-      _zert_ui_subtask_update $idx "Compiling ${plugin_id}..."
+      _zert_ui_subtask_update $idx "Compiling **${plugin_id}**..."
       if ! _zert_plugin_compile "$plugin_dir" 2>>"$log_file" >/dev/null; then
-        _zert_ui_subtask_update $idx "${plugin_id} compile failed — log: $log_file"
+        _zert_ui_subtask_update $idx "**${plugin_id}** compile failed — log: $log_file"
         _zert_ui_subtask_end $idx "fail"
         return 1
       fi
 
       _zert_rm -f "$log_file"
-      _zert_ui_subtask_update $idx "Installed ${plugin_id}"
+      _zert_ui_subtask_update $idx "Installed **${plugin_id}**"
       _zert_ui_subtask_end $idx "ok"
       return 0
     ) &
@@ -138,9 +138,9 @@ _zert_fast_track() {
   done
 
   if (( failed > 0 )); then
-    _zert_ui_task_end "fail" "$failed of $total plugins failed to install."
+    _zert_ui_task_end "fail" "**$failed** of **$total** plugins failed to install."
   else
-    _zert_ui_task_end "ok" "All $total plugins installed."
+    _zert_ui_task_end "ok" "All **$total** plugins installed."
   fi
 
   return 0

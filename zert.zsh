@@ -45,6 +45,9 @@ fi
 # Set up fpath for lazy loading
 fpath=("$_ZERT_BASE_DIR/functions" "$_ZERT_BASE_DIR/commands" $fpath)
 
+# Load zsh/system for sysread (unbuffered pipe reading)
+zmodload zsh/system
+
 # Mark functions for autoload
 autoload -Uz _zert_check_deps
 autoload -Uz _zert_cmd_list _zert_cmd_update _zert_cmd_prune _zert_cmd_use _zert_cmd_ohmyzsh _zert_cmd_prezto _zert_cmd_help

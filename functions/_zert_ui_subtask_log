@@ -2,9 +2,22 @@ _zert_ui_subtask_log(){
     local max_lines="${1:-4}"
     print -r "log_max=$max_lines" >&4
 
-    while IFS= read -d $'\r' -r line; do
-        [[ -z "$line" ]] && continue
-        # Escape protocol: \ -> \\, newline -> \n, = -> \=
-        print -r "log_line=${${${${line}//\\/\\\\}//$'\n'/\\n}//=/\\=}" >&4
+    # sysread returns bytes as soon as they're available (unbuffered syscall).
+    # This solves the pipe buffering problem where data would otherwise sit
+    # in the kernel pipe buffer until it fills (~4-64KB) or the writer exits.
+    local buf="" chunk line
+    while sysread -i 0 -s 4096 chunk; do
+        buf+="$chunk"
+        # Process all complete \r-delimited lines in the buffer
+        while [[ "$buf" == *$'\r'* ]]; do
+            line="${buf%%$'\r'*}"
+            buf="${buf#*$'\r'}"
+            # Strip leading \n from remaining buffer (handles \r\n line endings)
+            [[ "$buf" == $'\n'* ]] && buf="${buf#$'\n'}"
+            [[ -z "$line" ]] && continue
+            print -r "log_line=${${${${line}//\\/\\\\}//$'\n'/\\n}//=/\\=}" >&4
+        done
     done
+    # Flush remaining data (no trailing \r)
+    [[ -n "$buf" ]] && print -r "log_line=${${${${buf}//\\/\\\\}//$'\n'/\\n}//=/\\=}" >&4
 }
