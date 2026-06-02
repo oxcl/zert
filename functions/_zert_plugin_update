@@ -2,7 +2,20 @@ _zert_plugin_update() {
   local plugin_id="$1" source_type="$2" source_value="$3" plugin_dir="$4"
   shift 4
 
-  git -C "$plugin_dir" pull --ff-only 2>&1 || return 1
+  # Detect default remote branch
+  local branch
+  branch="$(git -C "$plugin_dir" symbolic-ref refs/remotes/origin/HEAD 2>/dev/null)"
+  branch="${branch##*/}"
+  [[ -z "$branch" ]] && branch="master"
+
+  # Fetch latest from remote
+  git -C "$plugin_dir" fetch origin 2>&1 || return 1
+
+  # Update the local branch to match the remote (pointer move, no merge)
+  git -C "$plugin_dir" update-ref "refs/heads/$branch" "origin/$branch" 2>&1 || return 1
+
+  # Check out the updated branch (moves HEAD from detached state to branch)
+  git -C "$plugin_dir" checkout "$branch" 2>&1 || return 1
 
   local commit_sha=""
   commit_sha="$(git -C "$plugin_dir" rev-parse HEAD 2>/dev/null)"
