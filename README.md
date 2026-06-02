@@ -157,6 +157,11 @@ export ZERT_LOCKFILE="$HOME/.zert.lock"     # Change the lockfile path
 **Install is parallel. Load is sequential.** This gives you the speed of parallel cloning without any of the ordering surprises.
 
 
+## ⭐ Support
+
+If Zert is useful to you, consider giving the repo a star on [GitHub](https://github.com/oxcl/zert) or making a [donation](https://oxcl.github.io/zert/#donate).
+
+
 ## 📄 License
 
 GNU General Public License v3.0 — see [`LICENSE`](./LICENSE) for details.

@@ -6,6 +6,7 @@ document.addEventListener('DOMContentLoaded', () => {
   initTabs();
   initCopyButtons();
   initLangSelector();
+  initDonate();
 });
 
 function initNav() {
@@ -203,4 +204,101 @@ function initLangSelector() {
       langContainer.classList.remove('open');
     });
   });
+}
+
+function initDonate() {
+  const qrImg = document.getElementById('donate-qr');
+  const addressEl = document.getElementById('donate-address');
+  const copyBtn = document.getElementById('donate-copy-btn');
+  let copyTimer = null;
+
+  if (!qrImg || !addressEl || !copyBtn) return;
+
+  function setQR(address, qrSrc) {
+    qrImg.style.opacity = '0';
+    qrImg.style.transform = 'scale(0.95)';
+    setTimeout(() => {
+      qrImg.src = qrSrc;
+      addressEl.textContent = address;
+      requestAnimationFrame(() => {
+        qrImg.style.opacity = '1';
+        qrImg.style.transform = 'scale(1)';
+      });
+    }, 200);
+  }
+
+  document.querySelectorAll('.token-item:not(.has-networks)').forEach((item) => {
+    item.addEventListener('click', () => {
+      document.querySelectorAll('.token-item').forEach((i) => i.classList.remove('active'));
+      item.classList.add('active');
+      setQR(item.dataset.address, item.dataset.qr);
+    });
+  });
+
+  document.querySelectorAll('.token-header').forEach((header) => {
+    header.addEventListener('click', () => {
+      const item = header.closest('.token-item');
+      const wasExpanded = item.classList.contains('expanded');
+      item.classList.toggle('expanded');
+      if (!wasExpanded) {
+        document.querySelectorAll('.token-item').forEach((i) => i.classList.remove('active'));
+        item.classList.add('active');
+        const activeNet = item.querySelector('.network-btn.active');
+        if (activeNet) setQR(activeNet.dataset.address, activeNet.dataset.qr);
+      }
+    });
+  });
+
+  document.querySelectorAll('.token-body .network-btn').forEach((btn) => {
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (btn.classList.contains('active')) return;
+      const item = btn.closest('.token-item');
+      item.querySelectorAll('.network-btn').forEach((b) => b.classList.remove('active'));
+      btn.classList.add('active');
+      setQR(btn.dataset.address, btn.dataset.qr);
+    });
+  });
+
+  function copyAddress() {
+    const text = addressEl.textContent;
+    if (!text) return;
+
+    const doCopy = () => {
+      if (copyTimer) clearTimeout(copyTimer);
+      copyBtn.textContent = copyBtn.dataset.copiedLabel || 'Copied';
+      copyBtn.classList.add('copied');
+      copyTimer = setTimeout(() => {
+        copyBtn.textContent = copyBtn.dataset.copyLabel || 'Copy';
+        copyBtn.classList.remove('copied');
+      }, 2000);
+    };
+
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(text).then(doCopy).catch(() => {
+        const ta = document.createElement('textarea');
+        ta.value = text;
+        ta.style.position = 'fixed';
+        ta.style.opacity = '0';
+        ta.style.pointerEvents = 'none';
+        document.body.appendChild(ta);
+        ta.select();
+        try { document.execCommand('copy'); doCopy(); } catch {}
+        document.body.removeChild(ta);
+      });
+    } else {
+      const ta = document.createElement('textarea');
+      ta.value = text;
+      ta.style.position = 'fixed';
+      ta.style.opacity = '0';
+      ta.style.pointerEvents = 'none';
+      document.body.appendChild(ta);
+      ta.select();
+      try { document.execCommand('copy'); doCopy(); } catch {}
+      document.body.removeChild(ta);
+    }
+  }
+
+  copyBtn.addEventListener('click', copyAddress);
+  addressEl.addEventListener('click', copyAddress);
 }

@@ -154,6 +154,12 @@ Inicio de .zshrc
 
 **La instalación es paralela. La carga es secuencial.** Esto te da la velocidad de la clonación paralela sin sorpresas de ordenamiento.
 
+
+## ⭐ Apoyo
+
+Si Zert te es útil, considera darle una estrella en [GitHub](https://github.com/oxcl/zert) o hacer una [donación](https://oxcl.github.io/zert/#donate).
+
+
 ## 📄 Licencia
 
 GNU General Public License v3.0 — ver [`LICENSE`](./LICENSE) para detalles.

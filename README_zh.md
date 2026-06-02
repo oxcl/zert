@@ -154,6 +154,12 @@ export ZERT_LOCKFILE="$HOME/.zert.lock"     # 更改锁文件路径
 
 **安装是并行的，加载是按顺序的。** 这为你提供了并行克隆的速度，同时不会出现任何排序问题。
 
+
+## ⭐ 支持
+
+如果 Zert 对你有用，请考虑在 [GitHub](https://github.com/oxcl/zert) 上给个星或进行[捐赠](https://oxcl.github.io/zert/#donate)。
+
+
 ## 📄 许可证
 
 GNU 通用公共许可证 v3.0 — 详见 [`LICENSE`](./LICENSE)。
